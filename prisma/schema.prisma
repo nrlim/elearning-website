@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+}
+
+model Module {
+  id          String    @id @default(uuid())
+  title       String
+  description String
+  createdAt   DateTime  @default(now())
+  content     Content[]
+}
+
+model Content {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  youtubeUrl  String
+  moduleId    String
+  module      Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+
+enum Role {
+  USER
+  ADMIN
+}
