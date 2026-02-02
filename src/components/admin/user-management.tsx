@@ -32,6 +32,9 @@ interface User {
     role: "USER" | "ADMIN"
     createdAt: string
     moduleTypes?: { id: string; name: string }[]
+    status: "ACTIVE" | "INACTIVE"
+    isTrial: boolean
+    trialEndsAt?: string | null
 }
 
 export function UserManagement() {
@@ -43,7 +46,10 @@ export function UserManagement() {
     const [formData, setFormData] = useState({
         name: "",
         role: "USER" as "USER" | "ADMIN",
-        moduleTypeIds: [] as string[]
+        moduleTypeIds: [] as string[],
+        status: "ACTIVE" as "ACTIVE" | "INACTIVE",
+        isTrial: false,
+        trialEndsAt: "" as string
     })
     const [createDialog, setCreateDialog] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
@@ -52,7 +58,9 @@ export function UserManagement() {
         email: "",
         password: "",
         role: "USER" as "USER" | "ADMIN",
-        moduleTypeIds: [] as string[]
+        moduleTypeIds: [] as string[],
+        isTrial: false,
+        trialEndsAt: "" as string
     })
 
     useEffect(() => {
@@ -76,7 +84,10 @@ export function UserManagement() {
         setFormData({
             name: user.name,
             role: user.role,
-            moduleTypeIds: user.moduleTypes?.map(t => t.id) || []
+            moduleTypeIds: user.moduleTypes?.map(t => t.id) || [],
+            status: user.status,
+            isTrial: user.isTrial,
+            trialEndsAt: user.trialEndsAt ? new Date(user.trialEndsAt).toISOString().split('T')[0] : ""
         })
         setEditDialog(true)
     }
@@ -94,6 +105,24 @@ export function UserManagement() {
         }
     }
 
+    const handlePromote = async (user: User) => {
+        if (!confirm(`Are you sure you want to promote ${user.name} to permanent?`)) return
+
+        try {
+            await axios.put(`/api/users/${user.id}`, {
+                name: user.name,
+                role: user.role,
+                moduleTypeIds: user.moduleTypes?.map(t => t.id) || [],
+                status: "ACTIVE",
+                isTrial: false,
+                trialEndsAt: null
+            })
+            await fetchUsers()
+        } catch (error) {
+            console.error("Failed to promote user", error)
+        }
+    }
+
     const handleCreate = async () => {
         try {
             await axios.post("/api/register", createFormData)
@@ -104,7 +133,9 @@ export function UserManagement() {
                 email: "",
                 password: "",
                 role: "USER",
-                moduleTypeIds: []
+                moduleTypeIds: [],
+                isTrial: false,
+                trialEndsAt: ""
             })
         } catch (error) {
             console.error("Failed to create user", error)
@@ -151,6 +182,8 @@ export function UserManagement() {
                                     <TableHead>Name</TableHead>
                                     <TableHead>Email</TableHead>
                                     <TableHead>Role</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Trial Ends</TableHead>
                                     <TableHead>Joined</TableHead>
                                     <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
@@ -183,8 +216,33 @@ export function UserManagement() {
                                                     )}
                                                 </div>
                                             </TableCell>
+                                            <TableCell>
+                                                <Badge variant={user.status === "ACTIVE" ? "outline" : "destructive"} className="shadow-sm w-fit">
+                                                    {user.status}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                {user.isTrial && user.trialEndsAt ? (
+                                                    <span className={new Date(user.trialEndsAt) < new Date() ? "text-destructive font-medium" : ""}>
+                                                        {new Date(user.trialEndsAt).toLocaleDateString()}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-muted-foreground">-</span>
+                                                )}
+                                            </TableCell>
                                             <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
                                             <TableCell className="text-right space-x-2">
+                                                {user.isTrial && (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handlePromote(user)}
+                                                        className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                                        title="Promote to Permanent"
+                                                    >
+                                                        <span className="font-bold">Promote</span>
+                                                    </Button>
+                                                )}
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
@@ -245,6 +303,39 @@ export function UserManagement() {
                                 ))}
                             </select>
                             <p className="text-xs text-muted-foreground">Select which module types this user can access.</p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <input
+                                type="checkbox"
+                                id="edit-isTrial"
+                                className="h-4 w-4 rounded border-gray-300"
+                                checked={formData.isTrial}
+                                onChange={(e) => setFormData({ ...formData, isTrial: e.target.checked })}
+                            />
+                            <Label htmlFor="edit-isTrial">Is Trial User?</Label>
+                        </div>
+                        {formData.isTrial && (
+                            <div className="space-y-2">
+                                <Label htmlFor="edit-trialEndsAt">Trial Ends At</Label>
+                                <Input
+                                    id="edit-trialEndsAt"
+                                    type="date"
+                                    value={formData.trialEndsAt}
+                                    onChange={(e) => setFormData({ ...formData, trialEndsAt: e.target.value })}
+                                />
+                            </div>
+                        )}
+                        <div className="space-y-2">
+                            <Label htmlFor="edit-status">Status</Label>
+                            <select
+                                id="edit-status"
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                value={formData.status}
+                                onChange={(e) => setFormData({ ...formData, status: e.target.value as "ACTIVE" | "INACTIVE" })}
+                            >
+                                <option value="ACTIVE">ACTIVE</option>
+                                <option value="INACTIVE">INACTIVE</option>
+                            </select>
                         </div>
                     </div>
                     <DialogFooter>
@@ -326,6 +417,29 @@ export function UserManagement() {
                                 </option>
                             ))}
                         </select>
+                    </div>
+                    <div className="space-y-2">
+                        <div className="flex items-center space-x-2 py-2">
+                            <input
+                                type="checkbox"
+                                id="create-isTrial"
+                                className="h-4 w-4 rounded border-gray-300"
+                                checked={createFormData.isTrial}
+                                onChange={(e) => setCreateFormData({ ...createFormData, isTrial: e.target.checked })}
+                            />
+                            <Label htmlFor="create-isTrial">Is Trial User?</Label>
+                        </div>
+                        {createFormData.isTrial && (
+                            <div className="space-y-2">
+                                <Label htmlFor="create-trialEndsAt">Trial Ends At</Label>
+                                <Input
+                                    id="create-trialEndsAt"
+                                    type="date"
+                                    value={createFormData.trialEndsAt}
+                                    onChange={(e) => setCreateFormData({ ...createFormData, trialEndsAt: e.target.value })}
+                                />
+                            </div>
+                        )}
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setCreateDialog(false)}>

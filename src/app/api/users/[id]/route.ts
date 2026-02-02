@@ -8,6 +8,9 @@ const userUpdateSchema = z.object({
     name: z.string().min(1).optional(),
     role: z.enum(["USER", "ADMIN"]).optional(),
     moduleTypeIds: z.array(z.string()).optional(),
+    status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
+    isTrial: z.boolean().optional(),
+    trialEndsAt: z.string().nullable().optional().transform(val => val ? new Date(val) : null), // Handle string input for Date
 })
 
 // PUT update user (Admin only)
@@ -41,7 +44,10 @@ export async function PUT(
                 email: true,
                 role: true,
                 createdAt: true,
-                moduleTypes: true
+                moduleTypes: true,
+                status: true,
+                isTrial: true,
+                trialEndsAt: true
             }
         })
 

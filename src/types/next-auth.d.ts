@@ -7,12 +7,16 @@ declare module "next-auth" {
         user: {
             id: string
             role: Role
+            isTrial?: boolean
+            trialEndsAt?: Date | string
         } & DefaultSession["user"]
     }
 
     interface User {
         id: string
         role: Role
+        isTrial?: boolean
+        trialEndsAt?: Date | string | null
     }
 }
 
@@ -20,5 +24,7 @@ declare module "next-auth/jwt" {
     interface JWT {
         id: string
         role: Role
+        isTrial?: boolean
+        trialEndsAt?: Date | string | null
     }
 }

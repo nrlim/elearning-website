@@ -20,6 +20,9 @@ export async function GET() {
                 role: true,
                 createdAt: true,
                 moduleTypes: true,
+                status: true,
+                isTrial: true,
+                trialEndsAt: true,
             },
             orderBy: {
                 createdAt: 'desc'

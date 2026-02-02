@@ -207,7 +207,16 @@ export function ContentManagement() {
         try {
             if (!selectedModuleId) return
 
-            const payload = { ...lessonFormData, moduleId: selectedModuleId }
+            let url = lessonFormData.youtubeUrl.trim()
+            if (url && !url.startsWith("http://") && !url.startsWith("https://")) {
+                url = `https://${url}`
+            }
+
+            const payload = {
+                ...lessonFormData,
+                youtubeUrl: url,
+                moduleId: selectedModuleId
+            }
 
             if (editingLesson) {
                 // Assuming we might need a separate endpoint for updating specific content 
@@ -221,9 +230,10 @@ export function ContentManagement() {
             }
             fetchModules() // Refresh all modules to see new count/lessons
             setLessonDialog(false)
-        } catch (error) {
+        } catch (error: any) {
             console.error("Failed to save lesson", error)
-            alert("Failed to save lesson. Check URL.")
+            const msg = error.response?.data?.error || "Failed to save lesson. Check inputs."
+            alert(msg)
         }
     }
 

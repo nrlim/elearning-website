@@ -16,6 +16,9 @@ model User {
   role      Role     @default(USER)
   createdAt DateTime @default(now())
   moduleTypes ModuleType[]
+  status      UserStatus @default(ACTIVE)
+  isTrial     Boolean    @default(false)
+  trialEndsAt DateTime?
 }
 
 model Module {
@@ -50,4 +53,9 @@ model Content {
 enum Role {
   USER
   ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
 }

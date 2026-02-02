@@ -11,6 +11,8 @@ const userSchema = z.object({
     password: z.string().min(6, "Password must be at least 6 characters"),
     role: z.enum(["USER", "ADMIN"]).optional().default("USER"),
     moduleTypeIds: z.array(z.string()).optional(),
+    isTrial: z.boolean().optional(),
+    trialEndsAt: z.string().optional().transform(val => val ? new Date(val) : null),
 })
 
 export async function POST(req: Request) {
@@ -22,7 +24,7 @@ export async function POST(req: Request) {
         }
 
         const body = await req.json()
-        const { email, name, password, role, moduleTypeIds } = userSchema.parse(body)
+        const { email, name, password, role, moduleTypeIds, isTrial, trialEndsAt } = userSchema.parse(body)
 
         const existingUser = await prisma.user.findUnique({
             where: { email }
@@ -40,6 +42,8 @@ export async function POST(req: Request) {
                 email,
                 password: hashedPassword,
                 role: role || "USER",
+                isTrial: isTrial || false,
+                trialEndsAt: trialEndsAt || null,
                 moduleTypes: moduleTypeIds ? {
                     connect: moduleTypeIds.map(id => ({ id }))
                 } : undefined
