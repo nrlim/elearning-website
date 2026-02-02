@@ -176,95 +176,97 @@ export function UserManagement() {
                         </div>
                     </CardHeader>
                     <CardContent className="p-0">
-                        <Table>
-                            <TableHeader className="bg-secondary/30">
-                                <TableRow>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Role</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Trial Ends</TableHead>
-                                    <TableHead>Joined</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {users.length === 0 ? (
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader className="bg-secondary/30">
                                     <TableRow>
-                                        <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
-                                            No users found
-                                        </TableCell>
+                                        <TableHead>Name</TableHead>
+                                        <TableHead>Email</TableHead>
+                                        <TableHead>Role</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead>Trial Ends</TableHead>
+                                        <TableHead>Joined</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
                                     </TableRow>
-                                ) : (
-                                    users.map((user) => (
-                                        <TableRow key={user.id} className="hover:bg-secondary/30 transition-colors">
-                                            <TableCell className="font-medium">{user.name}</TableCell>
-                                            <TableCell>{user.email}</TableCell>
-                                            <TableCell>
-                                                <div className="flex flex-col gap-1">
-                                                    <Badge variant={user.role === "ADMIN" ? "default" : "secondary"} className="shadow-sm w-fit">
-                                                        {user.role}
+                                </TableHeader>
+                                <TableBody>
+                                    {users.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
+                                                No users found
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        users.map((user) => (
+                                            <TableRow key={user.id} className="hover:bg-secondary/30 transition-colors">
+                                                <TableCell className="font-medium">{user.name}</TableCell>
+                                                <TableCell>{user.email}</TableCell>
+                                                <TableCell>
+                                                    <div className="flex flex-col gap-1">
+                                                        <Badge variant={user.role === "ADMIN" ? "default" : "secondary"} className="shadow-sm w-fit">
+                                                            {user.role}
+                                                        </Badge>
+                                                        {user.moduleTypes && user.moduleTypes.length > 0 && (
+                                                            <div className="flex flex-wrap gap-1 mt-1">
+                                                                {user.moduleTypes.map(t => (
+                                                                    <span key={t.id} className="text-[10px] bg-primary/10 text-primary px-1.5 rounded">
+                                                                        {t.name}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Badge variant={user.status === "ACTIVE" ? "outline" : "destructive"} className="shadow-sm w-fit">
+                                                        {user.status}
                                                     </Badge>
-                                                    {user.moduleTypes && user.moduleTypes.length > 0 && (
-                                                        <div className="flex flex-wrap gap-1 mt-1">
-                                                            {user.moduleTypes.map(t => (
-                                                                <span key={t.id} className="text-[10px] bg-primary/10 text-primary px-1.5 rounded">
-                                                                    {t.name}
-                                                                </span>
-                                                            ))}
-                                                        </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {user.isTrial && user.trialEndsAt ? (
+                                                        <span className={new Date(user.trialEndsAt) < new Date() ? "text-destructive font-medium" : ""}>
+                                                            {new Date(user.trialEndsAt).toLocaleDateString()}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-muted-foreground">-</span>
                                                     )}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge variant={user.status === "ACTIVE" ? "outline" : "destructive"} className="shadow-sm w-fit">
-                                                    {user.status}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell>
-                                                {user.isTrial && user.trialEndsAt ? (
-                                                    <span className={new Date(user.trialEndsAt) < new Date() ? "text-destructive font-medium" : ""}>
-                                                        {new Date(user.trialEndsAt).toLocaleDateString()}
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-muted-foreground">-</span>
-                                                )}
-                                            </TableCell>
-                                            <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
-                                            <TableCell className="text-right space-x-2">
-                                                {user.isTrial && (
+                                                </TableCell>
+                                                <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+                                                <TableCell className="text-right space-x-2">
+                                                    {user.isTrial && (
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => handlePromote(user)}
+                                                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                                            title="Promote to Permanent"
+                                                        >
+                                                            <span className="font-bold">Promote</span>
+                                                        </Button>
+                                                    )}
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        onClick={() => handlePromote(user)}
-                                                        className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                                                        title="Promote to Permanent"
+                                                        onClick={() => handleEdit(user)}
+                                                        className="hover:bg-primary/10 hover:text-primary"
                                                     >
-                                                        <span className="font-bold">Promote</span>
+                                                        <Pencil className="h-4 w-4" />
                                                     </Button>
-                                                )}
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => handleEdit(user)}
-                                                    className="hover:bg-primary/10 hover:text-primary"
-                                                >
-                                                    <Pencil className="h-4 w-4" />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => handleDelete(user.id)}
-                                                    className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleDelete(user.id)}
+                                                        className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
                     </CardContent>
                 </Card>
             </div>

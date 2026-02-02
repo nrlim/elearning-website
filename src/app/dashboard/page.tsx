@@ -15,7 +15,8 @@ import {
     Folder,
     BookOpen,
     PlayCircle,
-    ChevronDown
+    ChevronDown,
+    Shield
 } from "lucide-react"
 import axios from "axios"
 import {
@@ -271,8 +272,9 @@ export default function DashboardPage() {
 
                         {session?.user?.role === "ADMIN" && (
                             <Link href="/admin">
-                                <Button variant="ghost" size="sm" className="hidden sm:flex hover:bg-primary/10 hover:text-primary">
-                                    Admin Panel
+                                <Button variant="ghost" size="sm" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary">
+                                    <Shield className="h-4 w-4" />
+                                    <span className="hidden sm:inline">Admin Panel</span>
                                 </Button>
                             </Link>
                         )}

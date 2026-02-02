@@ -283,136 +283,138 @@ export function ContentManagement() {
 
                 <Card className="border-border/40 bg-card/50 backdrop-blur-sm overflow-hidden">
                     <CardContent className="p-0">
-                        <Table>
-                            <TableHeader className="bg-secondary/30">
-                                <TableRow>
-                                    <TableHead className="w-[50px]"></TableHead>
-                                    <TableHead>Module Title</TableHead>
-                                    <TableHead className="hidden md:table-cell">Description</TableHead>
-                                    <TableHead className="w-[100px] text-center">Lessons</TableHead>
-                                    <TableHead className="w-[80px] text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {loading ? (
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader className="bg-secondary/30">
                                     <TableRow>
-                                        <TableCell colSpan={5} className="h-24 text-center">Loading modules...</TableCell>
+                                        <TableHead className="w-[50px]"></TableHead>
+                                        <TableHead>Module Title</TableHead>
+                                        <TableHead className="hidden md:table-cell">Description</TableHead>
+                                        <TableHead className="w-[100px] text-center">Lessons</TableHead>
+                                        <TableHead className="w-[80px] text-right">Actions</TableHead>
                                     </TableRow>
-                                ) : modules.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
-                                            No modules found. Create one to get started.
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    modules.map((module) => (
-                                        <React.Fragment key={module.id}>
-                                            <TableRow className="group hover:bg-secondary/20 transition-colors border-b-0">
-                                                <TableCell>
-                                                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => toggleExpand(module.id)}>
-                                                        {expandedModules[module.id] ? (
-                                                            <ChevronDown className="h-4 w-4" />
-                                                        ) : (
-                                                            <ChevronRightIcon className="h-4 w-4" />
-                                                        )}
-                                                    </Button>
-                                                </TableCell>
-                                                <TableCell className="font-semibold text-primary">
-                                                    <div className="flex flex-col gap-1">
-                                                        <div className="flex items-center gap-2">
-                                                            <Folder className="h-4 w-4 text-primary/70" />
-                                                            {module.title}
-                                                        </div>
-                                                        {module.type && (
-                                                            <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full w-fit ml-6">
-                                                                {module.type.name}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="hidden md:table-cell text-muted-foreground">
-                                                    {module.description}
-                                                </TableCell>
-                                                <TableCell className="text-center">
-                                                    <span className="inline-flex items-center justify-center px-2 py-1 rounded-full bg-secondary text-xs">
-                                                        {module.content?.length || 0}
-                                                    </span>
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                                <MoreHorizontal className="h-4 w-4" />
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end">
-                                                            <DropdownMenuItem onClick={() => handleEditModule(module)}>
-                                                                <Pencil className="mr-2 h-4 w-4" /> Edit Module
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => handleCreateLesson(module.id)}>
-                                                                <Plus className="mr-2 h-4 w-4" /> Add Lesson
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => handleDeleteModule(module.id)} className="text-destructive">
-                                                                <Trash2 className="mr-2 h-4 w-4" /> Delete Module
-                                                            </DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
-                                                </TableCell>
-                                            </TableRow>
-
-                                            {expandedModules[module.id] && (
-                                                <TableRow className="bg-secondary/5 hover:bg-secondary/5 border-t-0">
-                                                    <TableCell colSpan={5} className="p-0">
-                                                        <div className="pl-12 pr-4 py-4 space-y-2">
-                                                            <div className="flex justify-between items-center px-2 mb-2">
-                                                                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Lessons in this module</h4>
-                                                                <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={() => handleCreateLesson(module.id)}>
-                                                                    <Plus className="h-3 w-3" /> Add Lesson
-                                                                </Button>
-                                                            </div>
-                                                            {(!module.content || module.content.length === 0) ? (
-                                                                <div className="text-sm text-muted-foreground px-4 py-2 italic border border-dashed rounded-md bg-background/50">
-                                                                    No lessons yet. Add one!
-                                                                </div>
+                                </TableHeader>
+                                <TableBody>
+                                    {loading ? (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="h-24 text-center">Loading modules...</TableCell>
+                                        </TableRow>
+                                    ) : modules.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
+                                                No modules found. Create one to get started.
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        modules.map((module) => (
+                                            <React.Fragment key={module.id}>
+                                                <TableRow className="group hover:bg-secondary/20 transition-colors border-b-0">
+                                                    <TableCell>
+                                                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => toggleExpand(module.id)}>
+                                                            {expandedModules[module.id] ? (
+                                                                <ChevronDown className="h-4 w-4" />
                                                             ) : (
-                                                                <div className="grid gap-2">
-                                                                    {module.content.map((lesson) => (
-                                                                        <div key={lesson.id} className="flex items-center gap-3 p-3 rounded-lg border bg-background/60 hover:border-primary/30 transition-all group/lesson">
-                                                                            <div className="relative h-10 w-16 shrink-0 rounded overflow-hidden bg-muted">
-                                                                                {getThumbnailUrl(lesson.youtubeUrl) ? (
-                                                                                    // eslint-disable-next-line @next/next/no-img-element
-                                                                                    <img src={getThumbnailUrl(lesson.youtubeUrl)!} alt="" className="h-full w-full object-cover" />
-                                                                                ) : (
-                                                                                    <div className="h-full w-full flex items-center justify-center bg-secondary">
-                                                                                        <Video className="h-4 w-4 text-muted-foreground" />
-                                                                                    </div>
-                                                                                )}
-                                                                            </div>
-                                                                            <div className="flex-1 min-w-0">
-                                                                                <div className="font-medium text-sm truncate">{lesson.title}</div>
-                                                                                <div className="text-xs text-muted-foreground truncate">{lesson.description}</div>
-                                                                            </div>
-                                                                            <div className="flex items-center gap-1 opacity-0 group-hover/lesson:opacity-100 transition-opacity">
-                                                                                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEditLesson(lesson)}>
-                                                                                    <Pencil className="h-3 w-3" />
-                                                                                </Button>
-                                                                                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDeleteLesson(lesson.id)}>
-                                                                                    <Trash2 className="h-3 w-3" />
-                                                                                </Button>
-                                                                            </div>
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
+                                                                <ChevronRightIcon className="h-4 w-4" />
+                                                            )}
+                                                        </Button>
+                                                    </TableCell>
+                                                    <TableCell className="font-semibold text-primary">
+                                                        <div className="flex flex-col gap-1">
+                                                            <div className="flex items-center gap-2">
+                                                                <Folder className="h-4 w-4 text-primary/70" />
+                                                                {module.title}
+                                                            </div>
+                                                            {module.type && (
+                                                                <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full w-fit ml-6">
+                                                                    {module.type.name}
+                                                                </span>
                                                             )}
                                                         </div>
                                                     </TableCell>
+                                                    <TableCell className="hidden md:table-cell text-muted-foreground">
+                                                        {module.description}
+                                                    </TableCell>
+                                                    <TableCell className="text-center">
+                                                        <span className="inline-flex items-center justify-center px-2 py-1 rounded-full bg-secondary text-xs">
+                                                            {module.content?.length || 0}
+                                                        </span>
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                                    <MoreHorizontal className="h-4 w-4" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end">
+                                                                <DropdownMenuItem onClick={() => handleEditModule(module)}>
+                                                                    <Pencil className="mr-2 h-4 w-4" /> Edit Module
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => handleCreateLesson(module.id)}>
+                                                                    <Plus className="mr-2 h-4 w-4" /> Add Lesson
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => handleDeleteModule(module.id)} className="text-destructive">
+                                                                    <Trash2 className="mr-2 h-4 w-4" /> Delete Module
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </TableCell>
                                                 </TableRow>
-                                            )}
-                                        </React.Fragment>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
+
+                                                {expandedModules[module.id] && (
+                                                    <TableRow className="bg-secondary/5 hover:bg-secondary/5 border-t-0">
+                                                        <TableCell colSpan={5} className="p-0">
+                                                            <div className="pl-12 pr-4 py-4 space-y-2">
+                                                                <div className="flex justify-between items-center px-2 mb-2">
+                                                                    <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Lessons in this module</h4>
+                                                                    <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={() => handleCreateLesson(module.id)}>
+                                                                        <Plus className="h-3 w-3" /> Add Lesson
+                                                                    </Button>
+                                                                </div>
+                                                                {(!module.content || module.content.length === 0) ? (
+                                                                    <div className="text-sm text-muted-foreground px-4 py-2 italic border border-dashed rounded-md bg-background/50">
+                                                                        No lessons yet. Add one!
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="grid gap-2">
+                                                                        {module.content.map((lesson) => (
+                                                                            <div key={lesson.id} className="flex items-center gap-3 p-3 rounded-lg border bg-background/60 hover:border-primary/30 transition-all group/lesson">
+                                                                                <div className="relative h-10 w-16 shrink-0 rounded overflow-hidden bg-muted">
+                                                                                    {getThumbnailUrl(lesson.youtubeUrl) ? (
+                                                                                        // eslint-disable-next-line @next/next/no-img-element
+                                                                                        <img src={getThumbnailUrl(lesson.youtubeUrl)!} alt="" className="h-full w-full object-cover" />
+                                                                                    ) : (
+                                                                                        <div className="h-full w-full flex items-center justify-center bg-secondary">
+                                                                                            <Video className="h-4 w-4 text-muted-foreground" />
+                                                                                        </div>
+                                                                                    )}
+                                                                                </div>
+                                                                                <div className="flex-1 min-w-0">
+                                                                                    <div className="font-medium text-sm truncate">{lesson.title}</div>
+                                                                                    <div className="text-xs text-muted-foreground truncate">{lesson.description}</div>
+                                                                                </div>
+                                                                                <div className="flex items-center gap-1 opacity-0 group-hover/lesson:opacity-100 transition-opacity">
+                                                                                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEditLesson(lesson)}>
+                                                                                        <Pencil className="h-3 w-3" />
+                                                                                    </Button>
+                                                                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDeleteLesson(lesson.id)}>
+                                                                                        <Trash2 className="h-3 w-3" />
+                                                                                    </Button>
+                                                                                </div>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )}
+                                            </React.Fragment>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
                     </CardContent>
                 </Card>
 

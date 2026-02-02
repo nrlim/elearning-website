@@ -101,48 +101,50 @@ export function ModuleTypeManagement() {
 
             <Card className="border-border/40 bg-card/50 backdrop-blur-sm">
                 <CardContent className="p-0">
-                    <Table>
-                        <TableHeader className="bg-secondary/30">
-                            <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Description</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {loading ? (
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader className="bg-secondary/30">
                                 <TableRow>
-                                    <TableCell colSpan={3} className="text-center h-24">Loading...</TableCell>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Description</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
-                            ) : types.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={3} className="text-center h-24 text-muted-foreground">No types found.</TableCell>
-                                </TableRow>
-                            ) : (
-                                types.map((type) => (
-                                    <TableRow key={type.id}>
-                                        <TableCell className="font-medium">
-                                            <div className="flex items-center gap-2">
-                                                <Tags className="h-4 w-4 text-primary" />
-                                                {type.name}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>{type.description}</TableCell>
-                                        <TableCell className="text-right">
-                                            <div className="flex justify-end gap-2">
-                                                <Button variant="ghost" size="icon" onClick={() => handleEdit(type)}>
-                                                    <Pencil className="h-4 w-4" />
-                                                </Button>
-                                                <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(type.id)}>
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        </TableCell>
+                            </TableHeader>
+                            <TableBody>
+                                {loading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={3} className="text-center h-24">Loading...</TableCell>
                                     </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
+                                ) : types.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={3} className="text-center h-24 text-muted-foreground">No types found.</TableCell>
+                                    </TableRow>
+                                ) : (
+                                    types.map((type) => (
+                                        <TableRow key={type.id}>
+                                            <TableCell className="font-medium">
+                                                <div className="flex items-center gap-2">
+                                                    <Tags className="h-4 w-4 text-primary" />
+                                                    {type.name}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>{type.description}</TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex justify-end gap-2">
+                                                    <Button variant="ghost" size="icon" onClick={() => handleEdit(type)}>
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(type.id)}>
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </CardContent>
             </Card>
 

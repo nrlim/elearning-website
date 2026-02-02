@@ -1,6 +1,10 @@
+"use client"
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { LoginModal } from "@/components/login-modal"
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { Menu } from "lucide-react"
 
 export function Navbar() {
     return (
@@ -23,7 +27,6 @@ export function Navbar() {
                     <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
                         Features
                     </Link>
-
                 </nav>
 
                 <div className="flex items-center gap-3">
@@ -33,6 +36,34 @@ export function Navbar() {
                         </Button>
                     </LoginModal>
 
+                    {/* Mobile Navigation */}
+                    <div className="md:hidden">
+                        <Sheet>
+                            <SheetTrigger asChild>
+                                <Button variant="ghost" size="icon" className="md:hidden">
+                                    <Menu className="h-6 w-6" />
+                                </Button>
+                            </SheetTrigger>
+                            <SheetContent side="right">
+                                <SheetHeader>
+                                    <SheetTitle className="text-left font-black bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
+                                        CryptoLearn
+                                    </SheetTitle>
+                                </SheetHeader>
+                                <div className="flex flex-col space-y-6 pt-6">
+                                    <Link href="/" className="text-lg font-medium text-foreground">
+                                        Home
+                                    </Link>
+                                    <Link href="#courses" className="text-lg font-medium text-muted-foreground hover:text-foreground">
+                                        Courses
+                                    </Link>
+                                    <Link href="#features" className="text-lg font-medium text-muted-foreground hover:text-foreground">
+                                        Features
+                                    </Link>
+                                </div>
+                            </SheetContent>
+                        </Sheet>
+                    </div>
                 </div>
             </div>
         </header>

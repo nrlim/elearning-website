@@ -58,9 +58,9 @@ export default function AdminPage() {
 
                     <div className="flex items-center gap-4">
                         <Link href="/dashboard">
-                            <Button variant="ghost" size="sm" className="hidden sm:flex gap-2">
+                            <Button variant="ghost" size="sm" className="flex gap-2">
                                 <LayoutDashboard className="h-4 w-4" />
-                                User View
+                                <span className="hidden sm:inline">User View</span>
                             </Button>
                         </Link>
                         <div className="h-8 w-px bg-border/60 mx-1 hidden md:block" />
@@ -83,18 +83,18 @@ export default function AdminPage() {
                 </div>
 
                 <Tabs defaultValue="content" className="space-y-6">
-                    <TabsList className="bg-secondary/50 p-1 rounded-lg border border-border/40 w-full md:w-auto inline-flex h-auto">
-                        <TabsTrigger value="content" className="gap-2 px-6 py-2.5 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all">
+                    <TabsList className="bg-secondary/50 p-1 rounded-lg border border-border/40 w-full grid grid-cols-3 md:w-auto md:inline-flex !h-auto">
+                        <TabsTrigger value="content" className="gap-2 h-10 px-3 md:px-6 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all">
                             <FileVideo className="h-4 w-4" />
-                            Content Management
+                            <span className="hidden md:inline">Content Management</span>
                         </TabsTrigger>
-                        <TabsTrigger value="users" className="gap-2 px-6 py-2.5 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all">
+                        <TabsTrigger value="users" className="gap-2 h-10 px-3 md:px-6 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all">
                             <Users className="h-4 w-4" />
-                            User Management
+                            <span className="hidden md:inline">User Management</span>
                         </TabsTrigger>
-                        <TabsTrigger value="types" className="gap-2 px-6 py-2.5 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all">
+                        <TabsTrigger value="types" className="gap-2 h-10 px-3 md:px-6 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all">
                             <Tags className="h-4 w-4" />
-                            Module Types
+                            <span className="hidden md:inline">Module Types</span>
                         </TabsTrigger>
                     </TabsList>
 
