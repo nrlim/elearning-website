@@ -31,6 +31,7 @@ interface User {
     email: string
     role: "USER" | "ADMIN"
     createdAt: string
+    moduleTypes?: { id: string; name: string }[]
 }
 
 export function UserManagement() {
@@ -38,18 +39,25 @@ export function UserManagement() {
     const [loading, setLoading] = useState(true)
     const [editingUser, setEditingUser] = useState<User | null>(null)
     const [editDialog, setEditDialog] = useState(false)
-    const [formData, setFormData] = useState({ name: "", role: "USER" as "USER" | "ADMIN" })
+    const [moduleTypes, setModuleTypes] = useState<{ id: string, name: string }[]>([])
+    const [formData, setFormData] = useState({
+        name: "",
+        role: "USER" as "USER" | "ADMIN",
+        moduleTypeIds: [] as string[]
+    })
     const [createDialog, setCreateDialog] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
     const [createFormData, setCreateFormData] = useState({
         name: "",
         email: "",
         password: "",
-        role: "USER" as "USER" | "ADMIN"
+        role: "USER" as "USER" | "ADMIN",
+        moduleTypeIds: [] as string[]
     })
 
     useEffect(() => {
         fetchUsers()
+        axios.get("/api/module-types").then(res => setModuleTypes(res.data)).catch(console.error)
     }, [])
 
     const fetchUsers = async () => {
@@ -65,7 +73,11 @@ export function UserManagement() {
 
     const handleEdit = (user: User) => {
         setEditingUser(user)
-        setFormData({ name: user.name, role: user.role })
+        setFormData({
+            name: user.name,
+            role: user.role,
+            moduleTypeIds: user.moduleTypes?.map(t => t.id) || []
+        })
         setEditDialog(true)
     }
 
@@ -91,7 +103,8 @@ export function UserManagement() {
                 name: "",
                 email: "",
                 password: "",
-                role: "USER"
+                role: "USER",
+                moduleTypeIds: []
             })
         } catch (error) {
             console.error("Failed to create user", error)
@@ -155,9 +168,20 @@ export function UserManagement() {
                                             <TableCell className="font-medium">{user.name}</TableCell>
                                             <TableCell>{user.email}</TableCell>
                                             <TableCell>
-                                                <Badge variant={user.role === "ADMIN" ? "default" : "secondary"} className="shadow-sm">
-                                                    {user.role}
-                                                </Badge>
+                                                <div className="flex flex-col gap-1">
+                                                    <Badge variant={user.role === "ADMIN" ? "default" : "secondary"} className="shadow-sm w-fit">
+                                                        {user.role}
+                                                    </Badge>
+                                                    {user.moduleTypes && user.moduleTypes.length > 0 && (
+                                                        <div className="flex flex-wrap gap-1 mt-1">
+                                                            {user.moduleTypes.map(t => (
+                                                                <span key={t.id} className="text-[10px] bg-primary/10 text-primary px-1.5 rounded">
+                                                                    {t.name}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </TableCell>
                                             <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
                                             <TableCell className="text-right space-x-2">
@@ -204,16 +228,23 @@ export function UserManagement() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="role">Role</Label>
+                            <Label>Module Access (Hold Ctrl to select multiple)</Label>
                             <select
-                                id="role"
-                                value={formData.role}
-                                onChange={(e) => setFormData({ ...formData, role: e.target.value as "USER" | "ADMIN" })}
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                                multiple
+                                className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+                                value={formData.moduleTypeIds}
+                                onChange={(e) => {
+                                    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value)
+                                    setFormData({ ...formData, moduleTypeIds: selectedOptions })
+                                }}
                             >
-                                <option value="USER">USER</option>
-                                <option value="ADMIN">ADMIN</option>
+                                {moduleTypes.map((type) => (
+                                    <option key={type.id} value={type.id}>
+                                        {type.name}
+                                    </option>
+                                ))}
                             </select>
+                            <p className="text-xs text-muted-foreground">Select which module types this user can access.</p>
                         </div>
                     </div>
                     <DialogFooter>
@@ -277,18 +308,24 @@ export function UserManagement() {
                                 </Button>
                             </div>
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="create-role">Role</Label>
-                            <select
-                                id="create-role"
-                                value={createFormData.role}
-                                onChange={(e) => setCreateFormData({ ...createFormData, role: e.target.value as "USER" | "ADMIN" })}
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                            >
-                                <option value="USER">USER</option>
-                                <option value="ADMIN">ADMIN</option>
-                            </select>
-                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Module Access (Hold Ctrl to select multiple)</Label>
+                        <select
+                            multiple
+                            className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+                            value={createFormData.moduleTypeIds}
+                            onChange={(e) => {
+                                const selectedOptions = Array.from(e.target.selectedOptions, option => option.value)
+                                setCreateFormData({ ...createFormData, moduleTypeIds: selectedOptions })
+                            }}
+                        >
+                            {moduleTypes.map((type) => (
+                                <option key={type.id} value={type.id}>
+                                    {type.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setCreateDialog(false)}>

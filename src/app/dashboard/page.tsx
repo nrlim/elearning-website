@@ -14,9 +14,18 @@ import {
     ChevronRight,
     Folder,
     BookOpen,
-    PlayCircle
+    PlayCircle,
+    ChevronDown
 } from "lucide-react"
 import axios from "axios"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 interface Module {
     id: string
@@ -57,8 +66,45 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState("")
     const [page, setPage] = useState(1)
+    const [userModuleTypes, setUserModuleTypes] = useState<{ id: string, name: string, description?: string }[]>([])
+    const [selectedTypeId, setSelectedTypeId] = useState<string | null>(null)
 
     const debouncedSearch = useDebounceValue(searchQuery, 500)
+
+    // Brand Configuration
+    const BRAND_CONFIG: Record<string, { name: string, logo: string, description: string, color: string }> = {
+        "AC": {
+            name: "Akademi Crypto",
+            logo: "https://unavatar.io/google/akademicrypto.com",
+            description: "Belajar crypto dari dasar hingga mahir.",
+            color: "from-purple-500 to-blue-500"
+        },
+        "SULI": {
+            name: "Trade With Suli",
+            logo: "https://unavatar.io/twitter/tradewithsuli",
+            description: "Analisa teknikal dan fundamental mendalam.",
+            color: "from-yellow-500 to-orange-500"
+        },
+        "KJO": {
+            name: "KJo Academy",
+            logo: "https://unavatar.io/kjoacademy.com",
+            description: "Strategi trading dan manajemen portofolio.",
+            color: "from-green-500 to-teal-500"
+        }
+    }
+
+    // Helper to get brand info (fallback to DB name)
+    const getBrandInfo = (typeName: string) => {
+        const key = Object.keys(BRAND_CONFIG).find(k => k.toUpperCase() === typeName.toUpperCase())
+        if (key) return BRAND_CONFIG[key]
+
+        return {
+            name: typeName,
+            logo: `https://ui-avatars.com/api/?name=${encodeURIComponent(typeName)}&background=random`,
+            description: "Browse modules for this program.",
+            color: "from-primary to-purple-500"
+        }
+    }
 
     // Auth check
     useEffect(() => {
@@ -67,8 +113,35 @@ export default function DashboardPage() {
         }
     }, [status, router])
 
+    // Fetch user details to get assigned module types
+    useEffect(() => {
+        if (status === "authenticated") {
+            axios.get("/api/user/me")
+                .then(res => {
+                    const types = res.data.moduleTypes || []
+                    setUserModuleTypes(types)
+                    // If user has types, select the first one by default?
+                    // Or let them see everything they are allowed to see first (which is the default behavior if no typeId is sent)
+                    // The requirement says: "user can choose the module type first, before rendering all course"
+                    // If they have > 1 type, maybe we force selection or show "All"?
+                    // Let's select the first one if available to streamline the view
+                    if (types.length > 0) {
+                        setSelectedTypeId(types[0].id)
+                    }
+                })
+                .catch(err => console.error("Failed to fetch user types", err))
+        }
+    }, [status])
+
     // Data Fetching
     const fetchModules = useCallback(async () => {
+        if (status !== "authenticated") return
+
+        // If user has types but none selected yet, we might want to wait?
+        // But initially selectedTypeId is null.
+        // If we want to force selection, we can wait.
+        // But for now let's just fetch whatever is current.
+
         try {
             setLoading(true)
             const params = new URLSearchParams({
@@ -76,6 +149,10 @@ export default function DashboardPage() {
                 limit: "9",
                 search: debouncedSearch
             })
+
+            if (selectedTypeId) {
+                params.append("typeId", selectedTypeId)
+            }
 
             const { data } = await axios.get(`/api/modules?${params}`)
             setModules(data.data)
@@ -85,13 +162,11 @@ export default function DashboardPage() {
         } finally {
             setLoading(false)
         }
-    }, [page, debouncedSearch])
+    }, [page, debouncedSearch, selectedTypeId, status])
 
     useEffect(() => {
-        if (status === "authenticated") {
-            fetchModules()
-        }
-    }, [status, fetchModules])
+        fetchModules()
+    }, [fetchModules])
 
     // Helper for YouTube Thumbnail
     const getThumbnailUrl = (url: string) => {
@@ -131,14 +206,57 @@ export default function DashboardPage() {
             {/* Header */}
             <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
                 <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                    <Link href="/dashboard" className="flex items-center gap-2 group">
-                        <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-primary to-purple-500 flex items-center justify-center text-primary-foreground font-bold shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-all duration-300">
-                            CL
-                        </div>
-                        <span className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                            CryptoLearn
-                        </span>
-                    </Link>
+                    <div className="flex items-center gap-6">
+                        <Link href="/dashboard" className="flex items-center gap-2 group">
+                            <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-primary to-purple-500 flex items-center justify-center text-primary-foreground font-bold shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-all duration-300">
+                                CL
+                            </div>
+                            <span className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                                CryptoLearn
+                            </span>
+                        </Link>
+
+                        {/* Module Type Dropdown (Desktop) */}
+                        {userModuleTypes.length > 0 && (
+                            <div className="hidden md:flex items-center border-l border-border/60 pl-6">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" className="flex items-center gap-2 font-medium">
+                                            {selectedTypeId
+                                                ? userModuleTypes.find(t => t.id === selectedTypeId)?.name
+                                                : "All Courses"}
+                                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="start" className="w-[240px]">
+                                        <DropdownMenuLabel>Select Program</DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem onClick={() => {
+                                            setSelectedTypeId(null)
+                                            setPage(1)
+                                        }} className="cursor-pointer">
+                                            All Courses
+                                        </DropdownMenuItem>
+                                        {userModuleTypes.map(t => (
+                                            <DropdownMenuItem
+                                                key={t.id}
+                                                onClick={() => {
+                                                    setSelectedTypeId(t.id)
+                                                    setPage(1)
+                                                }}
+                                                className="cursor-pointer"
+                                            >
+                                                <div className="flex flex-col">
+                                                    <span className="font-medium truncate">{t.name}</span>
+                                                </div>
+                                                {selectedTypeId === t.id && <ChevronDown className="ml-auto h-4 w-4 rotate-[-90deg]" />}
+                                            </DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
+                        )}
+                    </div>
 
                     <div className="flex items-center gap-4">
                         <div className="hidden md:flex flex-col items-end">
@@ -166,15 +284,20 @@ export default function DashboardPage() {
             </header>
 
             {/* Main Content */}
+            {/* Main Content */}
             <main className="container mx-auto px-4 py-8 space-y-8">
                 {/* Hero / Filter Section */}
                 <div className="flex flex-col md:flex-row gap-6 justify-between items-end md:items-center">
                     <div className="space-y-1">
                         <h1 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
-                            My Courses
+                            {selectedTypeId
+                                ? userModuleTypes.find(t => t.id === selectedTypeId)?.name
+                                : "My Courses"}
                         </h1>
                         <p className="text-muted-foreground">
-                            Browse your learning modules.
+                            {selectedTypeId
+                                ? userModuleTypes.find(t => t.id === selectedTypeId)?.description || "Browse modules for this program."
+                                : "Browse your learning modules."}
                         </p>
                     </div>
 
@@ -191,6 +314,43 @@ export default function DashboardPage() {
                         />
                     </div>
                 </div>
+
+                {/* Mobile Module Selector (Fallback for small screens) */}
+                {userModuleTypes.length > 0 && (
+                    <div className="md:hidden">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className="w-full flex items-center justify-between h-12">
+                                    <span className="truncate flex items-center gap-2">
+                                        {selectedTypeId
+                                            ? userModuleTypes.find(t => t.id === selectedTypeId)?.name
+                                            : "All Courses"}
+                                    </span>
+                                    <ChevronDown className="h-4 w-4 opacity-50" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                                <DropdownMenuItem onClick={() => {
+                                    setSelectedTypeId(null)
+                                    setPage(1)
+                                }}>
+                                    All Courses
+                                </DropdownMenuItem>
+                                {userModuleTypes.map(t => (
+                                    <DropdownMenuItem
+                                        key={t.id}
+                                        onClick={() => {
+                                            setSelectedTypeId(t.id)
+                                            setPage(1)
+                                        }}
+                                    >
+                                        {t.name}
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                )}
 
                 {/* Modules Grid */}
                 {loading ? (

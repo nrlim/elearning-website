@@ -186,63 +186,91 @@ export default function Home() {
             <div className="grid md:grid-cols-3 gap-8">
               {[
                 {
-                  title: "Blockchain Basics",
-                  level: "Beginner",
-                  students: "5.2k",
-                  duration: "4h 30m",
-                  image: "/assets/course-blockchain-v2.png"
+                  title: "Akademi Crypto",
+                  level: "Comprehensive",
+                  students: "50k+",
+                  duration: "Mastery Path",
+                  image: "https://unavatar.io/google/akademicrypto.com",
+                  description: "Belajar crypto dari dasar hingga mahir. The ultimate comprehensive guide to cryptocurrency.",
+                  features: ["Crypto Basics", "Advanced DeFi", "Research Framework"]
                 },
                 {
-                  title: "Smart Contracts",
-                  level: "Intermediate",
-                  students: "3.2k",
-                  duration: "8h 15m",
-                  image: "/assets/course-smart-contracts-v2.png"
+                  title: "Trade With Suli",
+                  level: "Technical Analysis",
+                  students: "10k+",
+                  duration: "Signal & Analysis",
+                  image: "https://unavatar.io/twitter/tradewithsuli",
+                  description: "Analisa teknikal dan fundamental mendalam. Learn to trade like a pro with deep market insights.",
+                  features: ["Daily Signals", "Market Outlook", "Live TradingSession"]
                 },
                 {
-                  title: "DeFi Masterclass",
-                  level: "Advanced",
-                  students: "2.1k",
-                  duration: "12h 00m",
-                  image: "/assets/course-defi-v4.png"
+                  title: "KJo Academy",
+                  level: "Portfolio Mgmt",
+                  students: "15k+",
+                  duration: "Strategy",
+                  image: "https://unavatar.io/kjoacademy.com",
+                  description: "Strategi trading dan manajemen portofolio. Master the art of portfolio growth and risk management.",
+                  features: ["Portfolio Strategy", "Risk Management", "Altcoin Gems"]
                 }
               ].map((course, i) => (
-                <div key={i} className="group rounded-3xl border border-border/50 bg-card overflow-hidden hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1">
-                  <div className="aspect-square relative overflow-hidden">
+                <div key={i} className="group rounded-3xl border border-border/50 bg-card overflow-hidden hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 flex flex-col">
+                  <div className="aspect-video relative overflow-hidden bg-muted flex items-center justify-center p-8">
+                    {/* Blurred Background */}
                     <Image
                       src={course.image}
                       alt={course.title}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="object-cover opacity-20 blur-xl scale-150"
                     />
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
 
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20 backdrop-blur-[2px]">
-                      <div className="h-16 w-16 rounded-full bg-white/90 flex items-center justify-center text-primary shadow-xl scale-75 group-hover:scale-100 transition-transform duration-300">
-                        <PlayCircle className="h-8 w-8 fill-current" />
+                    {/* Main Logo */}
+                    <div className="relative h-24 w-24 rounded-full shadow-2xl overflow-hidden ring-4 ring-background/50 z-10 group-hover:scale-110 transition-transform duration-500">
+                      <Image
+                        src={course.image}
+                        alt={course.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20 backdrop-blur-[1px]">
+                      <div className="h-12 w-12 rounded-full bg-white/90 flex items-center justify-center text-primary shadow-xl scale-75 group-hover:scale-100 transition-transform duration-300">
+                        <ArrowRight className="h-6 w-6" />
                       </div>
                     </div>
                   </div>
-                  <div className="p-6">
+                  <div className="p-6 flex-1 flex flex-col">
                     <div className="flex justify-between items-start mb-4">
                       <span className="px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary">
                         {course.level}
                       </span>
                       <div className="flex items-center gap-1 text-xs font-medium text-amber-500">
                         <Star className="h-3.5 w-3.5 fill-current" />
-                        4.9
+                        5.0
                       </div>
                     </div>
                     <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
                       {course.title}
                     </h3>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground mt-6">
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                      {course.description}
+                    </p>
+
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {course.features.map(f => (
+                        <span key={f} className="text-[10px] uppercase tracking-wider font-medium px-2 py-1 rounded border border-border bg-muted/50">
+                          {f}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground mt-auto pt-4 border-t border-border/50">
                       <div className="flex items-center gap-1.5">
                         <Users className="h-4 w-4" />
                         {course.students}
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <PlayCircle className="h-4 w-4" />
+                      <div className="flex items-center gap-1.5 align-right ml-auto">
+                        <TrendingUp className="h-4 w-4" />
                         {course.duration}
                       </div>
                     </div>

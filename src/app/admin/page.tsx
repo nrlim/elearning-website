@@ -6,9 +6,10 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Users, FileVideo, LogOut, LayoutDashboard } from "lucide-react"
+import { Users, FileVideo, LogOut, LayoutDashboard, Tags } from "lucide-react"
 import { UserManagement } from "@/components/admin/user-management"
 import { ContentManagement } from "@/components/admin/content-management"
+import { ModuleTypeManagement } from "@/components/admin/module-type-management"
 
 export default function AdminPage() {
     const { data: session, status } = useSession()
@@ -91,6 +92,10 @@ export default function AdminPage() {
                             <Users className="h-4 w-4" />
                             User Management
                         </TabsTrigger>
+                        <TabsTrigger value="types" className="gap-2 px-6 py-2.5 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all">
+                            <Tags className="h-4 w-4" />
+                            Module Types
+                        </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="content" className="space-y-4 animate-in fade-in-50 slide-in-from-bottom-2 duration-500">
@@ -99,6 +104,10 @@ export default function AdminPage() {
 
                     <TabsContent value="users" className="space-y-4 animate-in fade-in-50 slide-in-from-bottom-2 duration-500">
                         <UserManagement />
+                    </TabsContent>
+
+                    <TabsContent value="types" className="space-y-4 animate-in fade-in-50 slide-in-from-bottom-2 duration-500">
+                        <ModuleTypeManagement />
                     </TabsContent>
                 </Tabs>
             </main>

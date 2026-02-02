@@ -61,6 +61,11 @@ interface Module {
     description: string
     createdAt: string
     content: Content[] // Parts/Lessons
+    typeId?: string
+    type?: {
+        id: string
+        name: string
+    }
     _count?: {
         content: number
     }
@@ -96,7 +101,8 @@ export function ContentManagement() {
     // Module Dialog State
     const [moduleDialog, setModuleDialog] = useState(false)
     const [editingModule, setEditingModule] = useState<Module | null>(null)
-    const [moduleFormData, setModuleFormData] = useState({ title: "", description: "" })
+    const [moduleFormData, setModuleFormData] = useState({ title: "", description: "", typeId: "" })
+    const [moduleTypes, setModuleTypes] = useState<{ id: string, name: string }[]>([])
 
     // Lesson Dialog State
     const [lessonDialog, setLessonDialog] = useState(false)
@@ -132,6 +138,7 @@ export function ContentManagement() {
 
     useEffect(() => {
         fetchModules()
+        axios.get("/api/module-types").then(res => setModuleTypes(res.data)).catch(console.error)
     }, [fetchModules])
 
     const toggleExpand = (moduleId: string) => {
@@ -142,13 +149,13 @@ export function ContentManagement() {
 
     const handleCreateModule = () => {
         setEditingModule(null)
-        setModuleFormData({ title: "", description: "" })
+        setModuleFormData({ title: "", description: "", typeId: "" })
         setModuleDialog(true)
     }
 
     const handleEditModule = (module: Module) => {
         setEditingModule(module)
-        setModuleFormData({ title: module.title, description: module.description })
+        setModuleFormData({ title: module.title, description: module.description, typeId: module.typeId || "" })
         setModuleDialog(true)
     }
 
@@ -301,9 +308,16 @@ export function ContentManagement() {
                                                     </Button>
                                                 </TableCell>
                                                 <TableCell className="font-semibold text-primary">
-                                                    <div className="flex items-center gap-2">
-                                                        <Folder className="h-4 w-4 text-primary/70" />
-                                                        {module.title}
+                                                    <div className="flex flex-col gap-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <Folder className="h-4 w-4 text-primary/70" />
+                                                            {module.title}
+                                                        </div>
+                                                        {module.type && (
+                                                            <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full w-fit ml-6">
+                                                                {module.type.name}
+                                                            </span>
+                                                        )}
                                                     </div>
                                                 </TableCell>
                                                 <TableCell className="hidden md:table-cell text-muted-foreground">
@@ -445,6 +459,21 @@ export function ContentManagement() {
                                 value={moduleFormData.description}
                                 onChange={(e) => setModuleFormData({ ...moduleFormData, description: e.target.value })}
                             />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Module Type</Label>
+                            <select
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                value={moduleFormData.typeId}
+                                onChange={(e) => setModuleFormData({ ...moduleFormData, typeId: e.target.value })}
+                            >
+                                <option value="">Select a type (optional)</option>
+                                {moduleTypes.map((type) => (
+                                    <option key={type.id} value={type.id}>
+                                        {type.name}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                     <DialogFooter>

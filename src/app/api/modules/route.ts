@@ -7,6 +7,7 @@ import { z } from "zod"
 const moduleSchema = z.object({
     title: z.string().min(1, "Title is required"),
     description: z.string().min(1, "Description is required"),
+    typeId: z.string().optional(),
 })
 
 export async function GET(req: Request) {
@@ -14,15 +15,72 @@ export async function GET(req: Request) {
     const page = parseInt(searchParams.get("page") || "1")
     const limit = parseInt(searchParams.get("limit") || "9")
     const search = searchParams.get("search") || ""
+    const typeIdParam = searchParams.get("typeId") || ""
 
     const skip = (page - 1) * limit
 
-    const where = search ? {
+    const session = await getServerSession(authOptions)
+
+    // Base filter for search
+    const searchFilter = search ? {
         OR: [
             { title: { contains: search, mode: 'insensitive' as const } },
             { description: { contains: search, mode: 'insensitive' as const } },
         ]
     } : {}
+
+    // Type filter based on user role AND user selection
+    let typeFilter: any = {}
+
+    // 1. First, determine what the user is ALLOWED to see
+    let allowedTypeIds: string[] | null = null // null means all keys (admin)
+
+    if (session && session.user.role !== "ADMIN") {
+        const user = await prisma.user.findUnique({
+            where: { email: session.user.email! },
+            include: { moduleTypes: true }
+        })
+
+        if (user) {
+            allowedTypeIds = user.moduleTypes.map(t => t.id)
+        } else {
+            allowedTypeIds = [] // blocked
+        }
+    }
+
+    // 2. Then, construct the query based on Allowed Types AND Requested Type
+    if (allowedTypeIds !== null) {
+        // Non-admin user
+        if (typeIdParam) {
+            // User wants a specific type. Check if allowed.
+            if (allowedTypeIds.includes(typeIdParam)) {
+                typeFilter = { typeId: typeIdParam }
+            } else {
+                // User requested a type they don't have access to -> give them nothing
+                typeFilter = { id: "nothing_matches" }
+            }
+        } else {
+            // User didn't request a specific type, show ALL allowed types (including public)
+            typeFilter = {
+                OR: [
+                    { typeId: null },
+                    { typeId: { in: allowedTypeIds } }
+                ]
+            }
+        }
+    } else {
+        // Admin (can see everything)
+        if (typeIdParam) {
+            typeFilter = { typeId: typeIdParam }
+        }
+    }
+
+    const where = {
+        AND: [
+            searchFilter,
+            typeFilter
+        ]
+    }
 
     try {
         const [modules, total] = await prisma.$transaction([
@@ -34,7 +92,8 @@ export async function GET(req: Request) {
                     createdAt: 'desc'
                 },
                 include: {
-                    content: true // Include parts/lessons
+                    content: true, // Include parts/lessons
+                    type: true, // Include module type
                 }
             }),
             prisma.module.count({ where })

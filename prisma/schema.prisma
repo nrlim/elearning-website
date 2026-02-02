@@ -15,14 +15,26 @@ model User {
   password  String
   role      Role     @default(USER)
   createdAt DateTime @default(now())
+  moduleTypes ModuleType[]
 }
 
 model Module {
-  id          String    @id @default(uuid())
+  id          String      @id @default(uuid())
   title       String
   description String
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime    @default(now())
   content     Content[]
+  typeId      String?
+  type        ModuleType? @relation(fields: [typeId], references: [id])
+}
+
+model ModuleType {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  modules     Module[]
+  users       User[]
 }
 
 model Content {

@@ -7,6 +7,7 @@ import { z } from "zod"
 const userUpdateSchema = z.object({
     name: z.string().min(1).optional(),
     role: z.enum(["USER", "ADMIN"]).optional(),
+    moduleTypeIds: z.array(z.string()).optional(),
 })
 
 // PUT update user (Admin only)
@@ -24,16 +25,23 @@ export async function PUT(
 
         const body = await req.json()
         const validatedData = userUpdateSchema.parse(body)
+        const { moduleTypeIds, ...rest } = validatedData
 
         const user = await prisma.user.update({
             where: { id },
-            data: validatedData,
+            data: {
+                ...rest,
+                moduleTypes: moduleTypeIds ? {
+                    set: moduleTypeIds.map(id => ({ id }))
+                } : undefined
+            },
             select: {
                 id: true,
                 name: true,
                 email: true,
                 role: true,
                 createdAt: true,
+                moduleTypes: true
             }
         })
 
