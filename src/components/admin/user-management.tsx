@@ -65,7 +65,7 @@ export function UserManagement() {
 
     useEffect(() => {
         fetchUsers()
-        axios.get("/api/module-types").then(res => setModuleTypes(res.data)).catch(console.error)
+        axios.get("/api/module-types").then(res => setModuleTypes(res.data)).catch(err => console.error("Failed to fetch module types"))
     }, [])
 
     const fetchUsers = async () => {
@@ -73,7 +73,7 @@ export function UserManagement() {
             const { data } = await axios.get("/api/users")
             setUsers(data)
         } catch (error) {
-            console.error("Failed to fetch users", error)
+            console.error("Failed to fetch users")
         } finally {
             setLoading(false)
         }
@@ -101,7 +101,7 @@ export function UserManagement() {
             setEditDialog(false)
             setEditingUser(null)
         } catch (error) {
-            console.error("Failed to update user", error)
+            console.error("Failed to update user")
         }
     }
 
@@ -119,7 +119,7 @@ export function UserManagement() {
             })
             await fetchUsers()
         } catch (error) {
-            console.error("Failed to promote user", error)
+            console.error("Failed to promote user")
         }
     }
 
@@ -138,7 +138,7 @@ export function UserManagement() {
                 trialEndsAt: ""
             })
         } catch (error) {
-            console.error("Failed to create user", error)
+            console.error("Failed to create user")
             alert("Failed to create user")
         }
     }
@@ -150,7 +150,7 @@ export function UserManagement() {
             await axios.delete(`/api/users/${id}`)
             await fetchUsers()
         } catch (error) {
-            console.error("Failed to delete user", error)
+            console.error("Failed to delete user")
         }
     }
 

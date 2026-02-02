@@ -130,7 +130,7 @@ export function ContentManagement() {
 
             // Should verify if backend includes content. My API implementation included content: true.
         } catch (error) {
-            console.error("Failed to fetch modules", error)
+            console.error("Failed to fetch modules")
         } finally {
             setLoading(false)
         }
@@ -138,7 +138,7 @@ export function ContentManagement() {
 
     useEffect(() => {
         fetchModules()
-        axios.get("/api/module-types").then(res => setModuleTypes(res.data)).catch(console.error)
+        axios.get("/api/module-types").then(res => setModuleTypes(res.data)).catch(err => console.error("Failed to fetch module types"))
     }, [fetchModules])
 
     const toggleExpand = (moduleId: string) => {
@@ -169,7 +169,7 @@ export function ContentManagement() {
             fetchModules()
             setModuleDialog(false)
         } catch (error) {
-            console.error("Failed to save module", error)
+            console.error("Failed to save module")
         }
     }
 
@@ -179,7 +179,7 @@ export function ContentManagement() {
             await axios.delete(`/api/modules/${id}`)
             fetchModules()
         } catch (error) {
-            console.error("Failed to delete module", error)
+            console.error("Failed to delete module")
         }
     }
 
@@ -231,7 +231,7 @@ export function ContentManagement() {
             fetchModules() // Refresh all modules to see new count/lessons
             setLessonDialog(false)
         } catch (error: any) {
-            console.error("Failed to save lesson", error)
+            console.error("Failed to save lesson")
             const msg = error.response?.data?.error || "Failed to save lesson. Check inputs."
             alert(msg)
         }
@@ -243,7 +243,7 @@ export function ContentManagement() {
             await axios.delete(`/api/content/${id}`)
             fetchModules()
         } catch (error) {
-            console.error("Failed to delete lesson", error)
+            console.error("Failed to delete lesson")
         }
     }
 
