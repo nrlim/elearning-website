@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { LoginModal } from "@/components/login-modal"
 
 export function Navbar() {
     return (
@@ -22,17 +23,15 @@ export function Navbar() {
                     <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
                         Features
                     </Link>
-                    <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                        Pricing
-                    </Link>
+
                 </nav>
 
                 <div className="flex items-center gap-3">
-                    <Link href="/login">
+                    <LoginModal>
                         <Button className="rounded-xl font-semibold bg-gradient-to-r from-primary to-purple-600 hover:opacity-90 shadow-lg shadow-primary/25 transition-all hover:scale-105">
                             Login
                         </Button>
-                    </Link>
+                    </LoginModal>
 
                 </div>
             </div>

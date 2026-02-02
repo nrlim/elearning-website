@@ -71,7 +71,7 @@ export default function ModuleDetailPage() {
         if (status === "authenticated") {
             fetchModule()
         } else if (status === "unauthenticated") {
-            router.push("/login")
+            router.push("/?login=true")
         }
     }, [status, fetchModule, router])
 
