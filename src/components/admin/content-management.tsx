@@ -178,7 +178,7 @@ function SortableLessonItem({ lesson, onEdit, onDelete }: { lesson: Content, onE
 
     return (
         <div ref={setNodeRef} style={style} className="flex items-center gap-3 p-3 rounded-lg border bg-background/60 hover:border-primary/30 transition-all group/lesson">
-            <div {...attributes} {...listeners} className="cursor-grab hover:text-primary text-muted-foreground">
+            <div {...attributes} {...listeners} className="cursor-grab hover:text-primary text-muted-foreground touch-none">
                 <GripVertical className="h-4 w-4" />
             </div>
             <div className="relative h-10 w-16 shrink-0 rounded overflow-hidden bg-muted">
@@ -225,7 +225,11 @@ export function ContentManagement() {
     const debouncedSearch = useDebounceValue(searchQuery, 500)
 
     const sensors = useSensors(
-        useSensor(PointerSensor),
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        }),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
         })
