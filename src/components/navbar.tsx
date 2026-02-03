@@ -9,9 +9,16 @@ import { Menu } from "lucide-react"
 
 export function Navbar() {
     return (
-        <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+        <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
             <div className="container mx-auto flex h-16 max-w-screen-2xl items-center justify-between px-4">
-                <Link className="flex items-center space-x-2 group" href="/">
+                <Link
+                    className="flex items-center space-x-2 group cursor-pointer"
+                    href="/"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                >
                     <div className="relative">
                         <div className="absolute inset-0 bg-gradient-to-r from-primary to-purple-400 blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
                         <span className="relative text-2xl font-black bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">

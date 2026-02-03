@@ -6,182 +6,236 @@ import Image from "next/image";
 import { ArrowRight, PlayCircle, BookOpen, Users, Award, TrendingUp, Shield, Zap, Check, Star } from "lucide-react";
 import { LoginModal } from "@/components/login-modal";
 
+import { ScrollToTop } from "@/components/scroll-to-top";
+
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground overflow-x-hidden selection:bg-primary/20 selection:text-primary">
       <Navbar />
+      <ScrollToTop />
 
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-20 pb-32">
-          {/* Background Elements */}
-          <div className="absolute inset-0 -z-10">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background" />
-            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px] opacity-50" />
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_80%)]" />
-          </div>
+        {/* Hero Section - Split Layout */}
+        <section className="relative min-h-[90vh] flex items-center overflow-hidden pt-20 pb-20">
+          <div className="container mx-auto px-4 md:px-6 z-10">
+            <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+              {/* Left: Content */}
+              <div className="flex flex-col items-start text-left space-y-8 animate-in fade-in slide-in-from-left-6 duration-700">
+                <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1]">
+                  Access Top <br />
+                  <span className="bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                    Crypto Academies
+                  </span>
+                </h1>
 
-          <div className="container mx-auto px-4 md:px-6 relative z-10">
-            <div className="flex flex-col items-center text-center space-y-8 max-w-4xl mx-auto">
-              {/* Badge */}
-              <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 border border-primary/10 backdrop-blur-sm shadow-sm hover:bg-primary/10 transition-colors cursor-default">
-                  <span className="flex h-2 w-2 relative">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/60 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                  </span>
-                  <span className="text-sm font-medium text-foreground/80">
-                    Trusted by <span className="text-primary font-semibold">10,000+</span> Students
-                  </span>
+                <p className="text-xl text-muted-foreground max-w-xl leading-relaxed">
+                  The ultimate mirroring platform. Get premium access to
+                  <span className="font-semibold text-foreground"> Akademi Crypto</span>,
+                  <span className="font-semibold text-foreground"> Trade With Suli</span>,
+                  <span className="font-semibold text-foreground"> KJo Academy</span>, and more.
+                  All in one subscription.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto pt-2">
+                  <LoginModal>
+                    <Button size="lg" className="h-14 px-8 text-lg rounded-xl gap-2 shadow-xl shadow-primary/20">
+                      Get All-Access
+                      <ArrowRight className="h-5 w-5" />
+                    </Button>
+                  </LoginModal>
+                  <Link href="#courses">
+                    <Button variant="ghost" size="lg" className="h-14 px-8 text-lg rounded-xl gap-2">
+                      View Catalog
+                    </Button>
+                  </Link>
+                </div>
+
+                <div className="pt-8 flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex -space-x-3">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="h-10 w-10 rounded-full border-2 border-background bg-muted flex items-center justify-center overflow-hidden">
+                        <img
+                          src={`https://i.pravatar.cc/100?img=${i + 10}`}
+                          alt="User"
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-foreground">1,000+ Students</span>
+                    <span className="text-xs">Joined this month</span>
+                  </div>
+                </div>
+
+                <div className="pt-8 border-t border-border/40 w-full">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-4">
+                    Premium Content From
+                  </p>
+                  <div className="flex flex-wrap gap-6 opacity-70 grayscale hover:grayscale-0 transition-all duration-300">
+                    {/* Partner Logos (Text representation for now, or use images if available) */}
+                    <div className="flex items-center gap-2 font-bold text-lg">
+                      <span className="h-6 w-6 rounded-full bg-blue-500 flex items-center justify-center text-[10px] text-white">AC</span>
+                      Akademi Crypto
+                    </div>
+                    <div className="flex items-center gap-2 font-bold text-lg">
+                      <span className="h-6 w-6 rounded-full bg-orange-500 flex items-center justify-center text-[10px] text-white">TS</span>
+                      SULI
+                    </div>
+                    <div className="flex items-center gap-2 font-bold text-lg">
+                      <span className="h-6 w-6 rounded-full bg-green-500 flex items-center justify-center text-[10px] text-white">KJ</span>
+                      KJo Academy
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Main Heading */}
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1] animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
-                Master the Future of <br className="hidden md:block" />
-                <span className="bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent pb-2">
-                  Web3 & Crypto
-                </span>
-              </h1>
+              {/* Right: 3D Visual */}
+              <div className="relative hidden lg:block perspective-[2000px] group">
+                {/* Glow behind */}
+                <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full opacity-50" />
 
-              {/* Subtitle */}
-              <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl leading-relaxed animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200">
-                Expert-led courses to help you master blockchain technology.
-                Start your journey from beginner to expert today.
-              </p>
+                {/* Tilted Card */}
+                <div className="relative bg-card border border-border/50 rounded-2xl shadow-2xl p-6 transition-all duration-700 transform rotate-y-[-12deg] rotate-x-[5deg] group-hover:rotate-y-[0deg] group-hover:rotate-x-[0deg]">
+                  {/* Fake Dashboard UI */}
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 bg-primary/20 rounded-lg flex items-center justify-center">
+                        <Zap className="text-primary h-6 w-6" />
+                      </div>
+                      <div>
+                        <p className="font-bold">{siteConfig.name} Pro</p>
+                        <p className="text-xs text-muted-foreground">Premium Plan</p>
+                      </div>
+                    </div>
+                    <div className="h-8 w-24 bg-muted rounded-full" />
+                  </div>
 
-              {/* Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto pt-4 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-300">
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="p-4 bg-muted/30 rounded-xl space-y-2">
+                      <p className="text-muted-foreground text-xs">Total Progress</p>
+                      <p className="text-2xl font-bold">84%</p>
+                      <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                        <div className="h-full w-[84%] bg-primary" />
+                      </div>
+                    </div>
+                    <div className="p-4 bg-muted/30 rounded-xl space-y-2">
+                      <p className="text-muted-foreground text-xs">Certificates</p>
+                      <p className="text-2xl font-bold">4</p>
+                      <div className="flex gap-1">
+                        <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                        <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                        <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                        <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    {[1, 2, 3].map(i => (
+                      <div key={i} className="flex items-center gap-4 p-3 hover:bg-muted/50 rounded-lg transition-colors cursor-pointer">
+                        <div className="h-10 w-16 bg-muted rounded-md relative overflow-hidden">
+                          <div className="absolute inset-0 bg-primary/10" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-sm">Advanced Trading Patterns</p>
+                          <p className="text-xs text-muted-foreground">Module {i} • 45 mins</p>
+                        </div>
+                        <PlayCircle className="h-8 w-8 text-primary opacity-50" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Features - Sticky Layout */}
+        <section id="features" className="py-24 bg-muted/20">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="grid lg:grid-cols-12 gap-12">
+
+              {/* Sticky Heading */}
+              <div className="lg:col-span-4 lg:sticky lg:top-32 self-start space-y-6">
+                <div className="inline-flex items-center gap-2 text-primary font-bold tracking-wider uppercase text-sm">
+                  <Shield className="h-4 w-4" />
+                  Why Choose Us
+                </div>
+                <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
+                  Reinventing how you <span className="text-primary">learn.</span>
+                </h2>
+                <p className="text-lg text-muted-foreground">
+                  {siteConfig.description}. We provide the tools you need to succeed.
+                </p>
                 <LoginModal>
-                  <Button size="lg" className="w-full sm:w-auto h-14 px-8 text-lg rounded-2xl gap-2 font-semibold shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30 transition-all hover:scale-[1.02]">
-                    Start Learning Free
-                    <ArrowRight className="h-5 w-5" />
+                  <Button className="gap-2 rounded-full">
+                    View All Features <ArrowRight className="h-4 w-4" />
                   </Button>
                 </LoginModal>
-                <Link href="#courses" className="w-full sm:w-auto">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto h-14 px-8 text-lg rounded-2xl gap-2 backdrop-blur-sm bg-background/50 hover:bg-background/80 transition-all hover:scale-[1.02]">
-                    <PlayCircle className="h-5 w-5" />
-                    View Courses
-                  </Button>
-                </Link>
               </div>
 
-              {/* Stats Strip */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-16 pt-16 border-t border-border/40 mt-16 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-500 w-full max-w-3xl">
+              {/* Scrolling Cards */}
+              <div className="lg:col-span-8 grid md:grid-cols-2 gap-6">
                 {[
-                  { label: "Active Students", value: "10K+" },
-                  { label: "Video Lessons", value: "500+" },
-                  { label: "Average Rating", value: "4.9/5" },
-                ].map((stat, i) => (
-                  <div key={i} className="flex flex-col items-center justify-center space-y-1">
-                    <div className="text-3xl md:text-4xl font-bold text-foreground">
-                      {stat.value}
+                  {
+                    icon: BookOpen,
+                    title: "Structured Learning",
+                    desc: "Curated paths from basics to advanced topics."
+                  },
+                  {
+                    icon: PlayCircle,
+                    title: "High-Quality Video",
+                    desc: "4K video content with professional audio."
+                  },
+                  {
+                    icon: Users,
+                    title: "Community First",
+                    desc: "Join thousands of learners in our Discord."
+                  },
+                  {
+                    icon: Zap,
+                    title: "Realtime Token Calls",
+                    desc: "Get instant alerts and trading signals for breakout tokens."
+                  },
+                  {
+                    icon: TrendingUp,
+                    title: "Market Analysis",
+                    desc: "Learn to analyze trends and market data."
+                  },
+                  {
+                    icon: Shield,
+                    title: "Secure Platform",
+                    desc: "Your progress and data are always unified."
+                  }
+                ].map((feature, i) => (
+                  <div key={i} className="group p-8 rounded-3xl bg-background border border-border/50 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1">
+                    <div className="h-14 w-14 rounded-2xl bg-secondary flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
+                      <feature.icon className="h-7 w-7" />
                     </div>
-                    <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                      {stat.label}
-                    </div>
+                    <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      {feature.desc}
+                    </p>
                   </div>
                 ))}
               </div>
+
             </div>
           </div>
         </section>
 
-        {/* Features Grid */}
-        <section id="features" className="py-24 md:py-32 bg-muted/30 relative">
+        {/* Featured Courses - Minimal List */}
+        <section id="courses" className="py-24">
           <div className="container mx-auto px-4 md:px-6">
-            <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
-              <div className="max-w-xl space-y-4">
-                <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
-                  Why learn with <span className="text-primary">{siteConfig.name}</span>?
-                </h2>
-                <p className="text-muted-foreground text-lg">
-                  We provide the most comprehensive curriculum designed for the modern web.
-                </p>
+            <div className="flex items-center justify-between mb-12">
+              <div>
+                <h2 className="text-3xl font-bold">Featured Courses</h2>
+                <p className="text-muted-foreground">Explore our most popular learning paths</p>
               </div>
-              <Button variant="ghost" className="hidden md:inline-flex gap-2">
-                See all features <ArrowRight className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                {
-                  icon: BookOpen,
-                  title: "Structured Learning",
-                  desc: "Curated paths from basics to advanced topics."
-                },
-                {
-                  icon: PlayCircle,
-                  title: "High-Quality Video",
-                  desc: "4K video content with professional audio."
-                },
-                {
-                  icon: Users,
-                  title: "Community First",
-                  desc: "Join thousands of learners in our Discord."
-                },
-                {
-                  icon: Award,
-                  title: "Certificates",
-                  desc: "Earn verified certificates upon completion."
-                },
-                {
-                  icon: TrendingUp,
-                  title: "Market Analysis",
-                  desc: "Learn to analyze trends and market data."
-                },
-                {
-                  icon: Shield,
-                  title: "Secure Platform",
-                  desc: "Your progress and data are always unified."
-                }
-              ].map((feature, i) => (
-                <div key={i} className="group p-8 rounded-3xl bg-background border border-border/50 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
-                  <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
-                    <feature.icon className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {feature.desc}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Featured Courses */}
-        <section id="courses" className="py-24 md:py-32">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="relative rounded-3xl overflow-hidden mb-16 border border-border/50 shadow-2xl shadow-primary/5 bg-background/60 backdrop-blur-xl">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-purple-500/5 to-blue-500/5" />
-
-              <div className="relative p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left z-10">
-                <div className="space-y-4 max-w-2xl">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold backdrop-blur-sm">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                    </span>
-                    Trending Now
-                  </div>
-                  <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
-                    Popular Courses
-                  </h2>
-                  <p className="text-muted-foreground text-lg">
-                    Explore our highest-rated courses and start learning today.
-                  </p>
-                </div>
-
-                <div className="flex-shrink-0">
-                  <LoginModal>
-                    <Button variant="outline" size="lg" className="h-12 px-8 rounded-xl gap-2 border-primary/20 bg-background/50 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300">
-                      View All Courses <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  </LoginModal>
-                </div>
-              </div>
+              <Link href="/dashboard" className="hidden md:block">
+                <Button variant="outline" className="gap-2">View All <ArrowRight className="h-4 w-4" /></Button>
+              </Link>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
@@ -214,106 +268,38 @@ export default function Home() {
                   features: ["Portfolio Strategy", "Risk Management", "Altcoin Gems"]
                 }
               ].map((course, i) => (
-                <div key={i} className="group rounded-3xl border border-border/50 bg-card overflow-hidden hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 flex flex-col">
-                  <div className="aspect-video relative overflow-hidden bg-muted flex items-center justify-center p-8">
-                    {/* Blurred Background */}
-                    <Image
-                      src={course.image}
-                      alt={course.title}
-                      fill
-                      className="object-cover opacity-20 blur-xl scale-150"
-                    />
+                <div key={i} className="group relative rounded-3xl overflow-hidden aspect-[4/5] bg-muted">
+                  <Image
+                    src={course.image}
+                    alt={course.title}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-60"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
-                    {/* Main Logo */}
-                    <div className="relative h-24 w-24 rounded-full shadow-2xl overflow-hidden ring-4 ring-background/50 z-10 group-hover:scale-110 transition-transform duration-500">
-                      <Image
-                        src={course.image}
-                        alt={course.title}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20 backdrop-blur-[1px]">
-                      <div className="h-12 w-12 rounded-full bg-white/90 flex items-center justify-center text-primary shadow-xl scale-75 group-hover:scale-100 transition-transform duration-300">
-                        <ArrowRight className="h-6 w-6" />
-                      </div>
-                    </div>
+                  <div className="absolute top-4 right-4">
+                    <span className="bg-background/20 backdrop-blur-md border border-white/10 text-white px-3 py-1 rounded-full text-xs font-medium">
+                      {course.level}
+                    </span>
                   </div>
-                  <div className="p-6 flex-1 flex flex-col">
-                    <div className="flex justify-between items-start mb-4">
-                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary">
-                        {course.level}
-                      </span>
-                      <div className="flex items-center gap-1 text-xs font-medium text-amber-500">
-                        <Star className="h-3.5 w-3.5 fill-current" />
-                        5.0
-                      </div>
-                    </div>
-                    <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-                      {course.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                      {course.description}
-                    </p>
 
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {course.features.map(f => (
-                        <span key={f} className="text-[10px] uppercase tracking-wider font-medium px-2 py-1 rounded border border-border bg-muted/50">
-                          {f}
-                        </span>
-                      ))}
+                  <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                    <h3 className="text-2xl font-bold text-white mb-2">{course.title}</h3>
+                    <p className="text-white/70 text-sm mb-4 line-clamp-2">{course.description}</p>
+
+                    <div className="flex items-center gap-4 text-xs text-white/50 mb-4 opacity-0 group-hover:opacity-100 transition-opacity delay-100">
+                      <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {course.students}</span>
+                      <span className="flex items-center gap-1"><PlayCircle className="h-3 w-3" /> {course.duration}</span>
                     </div>
 
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground mt-auto pt-4 border-t border-border/50">
-                      <div className="flex items-center gap-1.5">
-                        <Users className="h-4 w-4" />
-                        {course.students}
-                      </div>
-                      <div className="flex items-center gap-1.5 align-right ml-auto">
-                        <TrendingUp className="h-4 w-4" />
-                        {course.duration}
-                      </div>
-                    </div>
+                    <LoginModal>
+                      <Button className="w-full rounded-xl bg-white text-black hover:bg-white/90 font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                        Start Learning
+                      </Button>
+                    </LoginModal>
                   </div>
                 </div>
               ))}
-            </div>
-
-            <div className="mt-16 text-center">
-              <LoginModal>
-                <Button size="lg" variant="outline" className="rounded-full px-8">
-                  View All Courses
-                </Button>
-              </LoginModal>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="py-24 relative overflow-hidden">
-          <div className="absolute inset-0 bg-primary/5 -z-10" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent -z-10" />
-
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="max-w-4xl mx-auto text-center space-y-8">
-              <h2 className="text-4xl md:text-6xl font-bold tracking-tight">
-                Ready to start your journey?
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Join thousands of students and start learning blockchain technology today. Free to get started.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                <LoginModal>
-                  <Button size="lg" className="h-14 px-8 text-lg rounded-2xl w-full sm:w-auto">
-                    Get Started Now
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </LoginModal>
-              </div>
-              <p className="text-sm text-muted-foreground pt-4">
-                No credit card required for free courses.
-              </p>
             </div>
           </div>
         </section>
