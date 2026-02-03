@@ -27,3 +27,10 @@ export function extractYouTubeId(url: string): string | null {
 export function getYouTubeEmbedUrl(videoId: string): string {
     return `https://www.youtube.com/embed/${videoId}`
 }
+
+/**
+ * Get YouTube thumbnail URL (High Quality)
+ */
+export function getYouTubeThumbnailUrl(videoId: string): string {
+    return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+}

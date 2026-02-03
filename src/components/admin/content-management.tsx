@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import axios from "axios"
+import { extractYouTubeId, getYouTubeThumbnailUrl } from "@/lib/youtube"
 
 interface Content {
     id: string
@@ -89,6 +90,29 @@ function useDebounceValue<T>(value: T, delay: number): T {
         }
     }, [value, delay])
     return debouncedValue
+}
+
+function VideoThumbnail({ url, title }: { url: string, title: string }) {
+    const [error, setError] = useState(false)
+    const videoId = extractYouTubeId(url)
+
+    if (!videoId || error) {
+        return (
+            <div className="h-full w-full flex items-center justify-center bg-secondary">
+                <Video className="h-4 w-4 text-muted-foreground" />
+            </div>
+        )
+    }
+
+    return (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+            src={getYouTubeThumbnailUrl(videoId)}
+            alt={`Thumbnail for ${title}`}
+            className="h-full w-full object-cover"
+            onError={() => setError(true)}
+        />
+    )
 }
 
 export function ContentManagement() {
@@ -247,17 +271,7 @@ export function ContentManagement() {
         }
     }
 
-    const getThumbnailUrl = (url: string) => {
-        try {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
-            const match = url.match(regExp)
-            return (match && match[2].length === 11)
-                ? `https://img.youtube.com/vi/${match[2]}/default.jpg`
-                : null
-        } catch (e) {
-            return null
-        }
-    }
+
 
     return (
         <>
@@ -380,14 +394,7 @@ export function ContentManagement() {
                                                                         {module.content.map((lesson) => (
                                                                             <div key={lesson.id} className="flex items-center gap-3 p-3 rounded-lg border bg-background/60 hover:border-primary/30 transition-all group/lesson">
                                                                                 <div className="relative h-10 w-16 shrink-0 rounded overflow-hidden bg-muted">
-                                                                                    {getThumbnailUrl(lesson.youtubeUrl) ? (
-                                                                                        // eslint-disable-next-line @next/next/no-img-element
-                                                                                        <img src={getThumbnailUrl(lesson.youtubeUrl)!} alt="" className="h-full w-full object-cover" />
-                                                                                    ) : (
-                                                                                        <div className="h-full w-full flex items-center justify-center bg-secondary">
-                                                                                            <Video className="h-4 w-4 text-muted-foreground" />
-                                                                                        </div>
-                                                                                    )}
+                                                                                    <VideoThumbnail url={lesson.youtubeUrl} title={lesson.title} />
                                                                                 </div>
                                                                                 <div className="flex-1 min-w-0">
                                                                                     <div className="font-medium text-sm truncate">{lesson.title}</div>

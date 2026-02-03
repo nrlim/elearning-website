@@ -13,6 +13,7 @@ import {
     PlayCircle
 } from "lucide-react"
 import axios from "axios"
+import { extractYouTubeId, getYouTubeThumbnailUrl } from "@/lib/youtube"
 
 interface Content {
     id: string
@@ -30,6 +31,40 @@ interface Module {
     content: Content[]
 }
 
+const LessonThumbnail = ({ lesson, index }: { lesson: Content, index: number }) => {
+    const [error, setError] = useState(false)
+    const videoId = extractYouTubeId(lesson.youtubeUrl)
+
+    if (!videoId || error) {
+        return (
+            <div className="w-full h-full flex items-center justify-center bg-secondary/30">
+                <PlayCircle className="h-12 w-12 text-muted-foreground/50" />
+            </div>
+        )
+    }
+
+    return (
+        <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+                src={getYouTubeThumbnailUrl(videoId)}
+                alt={lesson.title}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                onError={() => setError(true)}
+            />
+            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
+                <div className="h-12 w-12 rounded-full bg-primary/90 text-primary-foreground flex items-center justify-center shadow-lg backdrop-blur-sm">
+                    <PlayCircle className="h-6 w-6 ml-0.5" />
+                </div>
+            </div>
+            <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white text-xs font-bold rounded">
+                Lesson {index + 1}
+            </div>
+        </>
+    )
+}
+
 export default function ModuleDetailPage() {
     const { data: session, status } = useSession()
     const params = useParams()
@@ -40,20 +75,7 @@ export default function ModuleDetailPage() {
     const [loading, setLoading] = useState(true)
 
     // Helper for YouTube Thumbnail
-    const getThumbnailUrl = (url: string) => {
-        try {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
-            const match = url.match(regExp)
-            const videoId = (match && match[2].length === 11) ? match[2] : null
 
-            if (videoId) {
-                return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
-            }
-            return null
-        } catch (e) {
-            return null
-        }
-    }
 
     const fetchModule = useCallback(async () => {
         try {
@@ -147,61 +169,35 @@ export default function ModuleDetailPage() {
                         </div>
                     ) : (
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            {module.content.map((lesson, index) => {
-                                const thumbnailUrl = getThumbnailUrl(lesson.youtubeUrl)
-                                return (
-                                    <Link key={lesson.id} href={`/content/${lesson.id}`} className="group block h-full">
-                                        <Card className="h-full border-border/40 bg-card/50 backdrop-blur-sm hover:bg-card/80 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 overflow-hidden flex flex-col">
-                                            {/* Thumbnail Section */}
-                                            <div className="relative aspect-video w-full overflow-hidden bg-black/5">
-                                                {thumbnailUrl ? (
-                                                    <>
-                                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                        <img
-                                                            src={thumbnailUrl}
-                                                            alt={lesson.title}
-                                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                                        />
-                                                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-                                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
-                                                            <div className="h-12 w-12 rounded-full bg-primary/90 text-primary-foreground flex items-center justify-center shadow-lg backdrop-blur-sm">
-                                                                <PlayCircle className="h-6 w-6 ml-0.5" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white text-xs font-bold rounded">
-                                                            Lesson {index + 1}
-                                                        </div>
-                                                    </>
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center bg-secondary/30">
-                                                        <PlayCircle className="h-12 w-12 text-muted-foreground/50" />
-                                                    </div>
-                                                )}
-                                            </div>
+                            {module.content.map((lesson, index) => (
+                                <Link key={lesson.id} href={`/content/${lesson.id}`} className="group block h-full">
+                                    <Card className="h-full border-border/40 bg-card/50 backdrop-blur-sm hover:bg-card/80 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 overflow-hidden flex flex-col">
+                                        <div className="relative aspect-video w-full overflow-hidden bg-black/5">
+                                            <LessonThumbnail lesson={lesson} index={index} />
+                                        </div>
 
-                                            <CardContent className="p-5 flex-1 flex flex-col">
-                                                <h3 className="font-semibold text-lg line-clamp-2 group-hover:text-primary transition-colors mb-2">
-                                                    {lesson.title}
-                                                </h3>
+                                        <CardContent className="p-5 flex-1 flex flex-col">
+                                            <h3 className="font-semibold text-lg line-clamp-2 group-hover:text-primary transition-colors mb-2">
+                                                {lesson.title}
+                                            </h3>
 
-                                                <p className="text-sm text-muted-foreground line-clamp-2 flex-1">
-                                                    {lesson.description}
-                                                </p>
+                                            <p className="text-sm text-muted-foreground line-clamp-2 flex-1">
+                                                {lesson.description}
+                                            </p>
 
-                                                <div className="flex items-center justify-between pt-4 mt-4 border-t border-border/30">
-                                                    <div className="flex items-center text-xs text-muted-foreground">
-                                                        <Clock className="h-3.5 w-3.5 mr-1" />
-                                                        {new Date(lesson.createdAt).toLocaleDateString()}
-                                                    </div>
-                                                    <span className="text-xs font-medium text-primary flex items-center group-hover:underline">
-                                                        Start Learning
-                                                    </span>
+                                            <div className="flex items-center justify-between pt-4 mt-4 border-t border-border/30">
+                                                <div className="flex items-center text-xs text-muted-foreground">
+                                                    <Clock className="h-3.5 w-3.5 mr-1" />
+                                                    {new Date(lesson.createdAt).toLocaleDateString()}
                                                 </div>
-                                            </CardContent>
-                                        </Card>
-                                    </Link>
-                                )
-                            })}
+                                                <span className="text-xs font-medium text-primary flex items-center group-hover:underline">
+                                                    Start Learning
+                                                </span>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </Link>
+                            ))}
                         </div>
                     )}
                 </div>

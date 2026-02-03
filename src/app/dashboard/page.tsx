@@ -27,6 +27,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { extractYouTubeId, getYouTubeThumbnailUrl } from "@/lib/youtube"
 
 interface Module {
     id: string
@@ -55,6 +56,37 @@ function useDebounceValue<T>(value: T, delay: number): T {
         }
     }, [value, delay])
     return debouncedValue
+}
+
+const ModuleBanner = ({ url, title }: { url?: string, title: string }) => {
+    const [error, setError] = useState(false)
+    const videoId = url ? extractYouTubeId(url) : null
+
+    if (!videoId || error) {
+        return (
+            <div className="h-full w-full flex items-center justify-center bg-secondary/50">
+                <Folder className="h-12 w-12 text-muted-foreground/30" />
+            </div>
+        )
+    }
+
+    return (
+        <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+                src={getYouTubeThumbnailUrl(videoId)}
+                alt={title}
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onError={() => setError(true)}
+            />
+            <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
+            <div className="absolute bottom-4 left-4 right-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                <div className="h-10 w-10 rounded-full bg-primary/90 text-primary-foreground flex items-center justify-center shadow-lg backdrop-blur-sm">
+                    <PlayCircle className="h-5 w-5 ml-0.5" />
+                </div>
+            </div>
+        </>
+    )
 }
 
 export default function DashboardPage() {
@@ -170,17 +202,7 @@ export default function DashboardPage() {
     }, [fetchModules])
 
     // Helper for YouTube Thumbnail
-    const getThumbnailUrl = (url: string) => {
-        try {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
-            const match = url.match(regExp)
-            return (match && match[2].length === 11)
-                ? `https://img.youtube.com/vi/${match[2]}/maxresdefault.jpg`
-                : null
-        } catch (e) {
-            return null
-        }
-    }
+
 
     const handleLogout = async () => {
         await signOut({ callbackUrl: "/" })
@@ -386,26 +408,10 @@ export default function DashboardPage() {
                                 <Card className="h-full border-border/40 bg-card/50 backdrop-blur-sm hover:bg-card/80 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 flex flex-col relative overflow-hidden">
                                     {/* Banner Image */}
                                     <div className="relative h-48 w-full bg-muted overflow-hidden">
-                                        {module.content && module.content.length > 0 && getThumbnailUrl(module.content[0].youtubeUrl) ? (
-                                            <>
-                                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                <img
-                                                    src={getThumbnailUrl(module.content[0].youtubeUrl)!}
-                                                    alt={module.title}
-                                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                                />
-                                                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
-                                                <div className="absolute bottom-4 left-4 right-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                                                    <div className="h-10 w-10 rounded-full bg-primary/90 text-primary-foreground flex items-center justify-center shadow-lg backdrop-blur-sm">
-                                                        <PlayCircle className="h-5 w-5 ml-0.5" />
-                                                    </div>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <div className="h-full w-full flex items-center justify-center bg-secondary/50">
-                                                <Folder className="h-12 w-12 text-muted-foreground/30" />
-                                            </div>
-                                        )}
+                                        <ModuleBanner
+                                            url={module.content && module.content.length > 0 ? module.content[0].youtubeUrl : undefined}
+                                            title={module.title}
+                                        />
                                     </div>
 
                                     <CardContent className="p-6 flex-1 flex flex-col gap-4">
