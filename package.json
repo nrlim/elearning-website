@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
-    "seed:superadmin": "ts-node -P prisma/tsconfig.seed.json prisma/seed-superadmin.ts"
+    "seed:superadmin": "ts-node -P prisma/tsconfig.seed.json prisma/seed-superadmin.ts",
+    "backup:content": "ts-node -P prisma/tsconfig.seed.json prisma/backup-content.ts",
+    "restore:content": "ts-node -P prisma/tsconfig.seed.json prisma/restore-content.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

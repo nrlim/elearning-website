@@ -19,7 +19,9 @@ interface Content {
     id: string
     title: string
     description: string
-    youtubeUrl: string
+    videoUrl: string
+    videoSource: 'YOUTUBE' | 'GOOGLE_DRIVE' | 'DIRECT_UPLOAD'
+    thumbnail?: string | null
     createdAt: string
 }
 
@@ -33,35 +35,89 @@ interface Module {
 
 const LessonThumbnail = ({ lesson, index }: { lesson: Content, index: number }) => {
     const [error, setError] = useState(false)
-    const videoId = extractYouTubeId(lesson.youtubeUrl)
 
-    if (!videoId || error) {
+    // 1. Use stored thumbnail if available
+    if (lesson.thumbnail && !error) {
         return (
-            <div className="w-full h-full flex items-center justify-center bg-secondary/30">
-                <PlayCircle className="h-12 w-12 text-muted-foreground/50" />
-            </div>
+            <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                    src={lesson.thumbnail}
+                    alt={lesson.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    onError={() => setError(true)}
+                />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
+                    <div className="h-12 w-12 rounded-full bg-primary/90 text-primary-foreground flex items-center justify-center shadow-lg backdrop-blur-sm">
+                        <PlayCircle className="h-6 w-6 ml-0.5" />
+                    </div>
+                </div>
+                <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white text-xs font-bold rounded">
+                    Lesson {index + 1}
+                </div>
+            </>
         )
     }
 
-    return (
-        <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-                src={getYouTubeThumbnailUrl(videoId)}
-                alt={lesson.title}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                onError={() => setError(true)}
-            />
-            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
-                <div className="h-12 w-12 rounded-full bg-primary/90 text-primary-foreground flex items-center justify-center shadow-lg backdrop-blur-sm">
-                    <PlayCircle className="h-6 w-6 ml-0.5" />
+    // 2. Fallback for Google Drive if no thumbnail stored (legacy data)
+    if (lesson.videoUrl?.includes('drive.google.com') && !error) {
+        return (
+            <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                    src="/thumbnails/google-drive-placeholder.png"
+                    alt={lesson.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    onError={() => setError(true)}
+                />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
+                    <div className="h-12 w-12 rounded-full bg-primary/90 text-primary-foreground flex items-center justify-center shadow-lg backdrop-blur-sm">
+                        <PlayCircle className="h-6 w-6 ml-0.5" />
+                    </div>
                 </div>
-            </div>
+                <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white text-xs font-bold rounded">
+                    Lesson {index + 1}
+                </div>
+            </>
+        )
+    }
+
+    // 3. Last resort: Try extracting YouTube ID if no thumbnail stored
+    const videoId = extractYouTubeId(lesson.videoUrl)
+
+    if (videoId && !error) {
+        return (
+            <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                    src={getYouTubeThumbnailUrl(videoId)}
+                    alt={lesson.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    onError={() => setError(true)}
+                />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
+                    <div className="h-12 w-12 rounded-full bg-primary/90 text-primary-foreground flex items-center justify-center shadow-lg backdrop-blur-sm">
+                        <PlayCircle className="h-6 w-6 ml-0.5" />
+                    </div>
+                </div>
+                <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white text-xs font-bold rounded">
+                    Lesson {index + 1}
+                </div>
+            </>
+        )
+    }
+
+    // 4. Generic Fallback
+    return (
+        <div className="w-full h-full flex items-center justify-center bg-secondary/30">
+            <PlayCircle className="h-12 w-12 text-muted-foreground/50" />
             <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white text-xs font-bold rounded">
                 Lesson {index + 1}
             </div>
-        </>
+        </div>
     )
 }
 

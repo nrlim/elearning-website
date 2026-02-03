@@ -41,13 +41,23 @@ model ModuleType {
 }
 
 model Content {
-  id          String   @id @default(uuid())
+  id          String      @id @default(uuid())
   title       String
   description String
-  youtubeUrl  String
+  videoUrl    String      // Can be YouTube URL, Google Drive URL, or file path
+  videoSource VideoSource @default(YOUTUBE)
+  thumbnail   String?     // Optional thumbnail URL
+  duration    Int?        // Video duration in seconds
   moduleId    String
-  module      Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
+  module      Module      @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+enum VideoSource {
+  YOUTUBE
+  GOOGLE_DRIVE
+  DIRECT_UPLOAD
 }
 
 enum Role {

@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { YouTubePlayer } from "@/components/youtube-player"
+import { UniversalVideoPlayer } from "@/components/universal-video-player"
 import { ArrowLeft, ChevronRight, PlayCircle, CheckCircle } from "lucide-react"
 import axios from "axios"
 import React from "react"
@@ -14,7 +14,9 @@ interface Content {
     id: string
     title: string
     description: string
-    youtubeUrl: string
+    videoUrl: string
+    videoSource: 'YOUTUBE' | 'GOOGLE_DRIVE' | 'DIRECT_UPLOAD'
+    thumbnail?: string | null
     createdAt: string
     moduleId: string
 }
@@ -135,7 +137,7 @@ export default function ContentDetailPage() {
 
                     <Card className="border-border/40 overflow-hidden bg-card/50 backdrop-blur-sm shadow-xl">
                         <CardContent className="p-0">
-                            <YouTubePlayer url={content.youtubeUrl} title={content.title} />
+                            <UniversalVideoPlayer url={content.videoUrl} title={content.title} />
                         </CardContent>
                     </Card>
 

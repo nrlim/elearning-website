@@ -7,7 +7,7 @@ import { z } from "zod"
 const contentSchema = z.object({
     title: z.string().min(1, "Title is required"),
     description: z.string().min(1, "Description is required"),
-    youtubeUrl: z.string().url("Invalid YouTube URL"),
+    videoUrl: z.string().url("Invalid video URL"),
     moduleId: z.string().uuid("Invalid Module ID"),
 })
 
@@ -61,6 +61,37 @@ export async function GET(req: Request) {
     }
 }
 
+// Helper function to detect video source
+function detectVideoSource(url: string): 'YOUTUBE' | 'GOOGLE_DRIVE' | 'DIRECT_UPLOAD' {
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+        return 'YOUTUBE'
+    }
+    if (url.includes('drive.google.com')) {
+        return 'GOOGLE_DRIVE'
+    }
+    return 'DIRECT_UPLOAD'
+}
+
+// Helper to extract YouTube ID
+function extractYouTubeId(url: string): string | null {
+    const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([^\&\?\/]+)/,
+        /^([a-zA-Z0-9_-]{11})$/
+    ]
+    for (const pattern of patterns) {
+        const match = url.match(pattern)
+        if (match && match[1]) {
+            return match[1]
+        }
+    }
+    return null
+}
+
+// Helper to get YouTube thumbnail
+function getYouTubeThumbnail(videoId: string): string {
+    return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+}
+
 // POST create new content (Admin only)
 export async function POST(req: Request) {
     try {
@@ -73,8 +104,27 @@ export async function POST(req: Request) {
         const body = await req.json()
         const validatedData = contentSchema.parse(body)
 
+        // Detect video source
+        const videoSource = detectVideoSource(validatedData.videoUrl)
+
+        // Generate thumbnail for YouTube videos
+        let thumbnail = null
+        if (videoSource === 'YOUTUBE') {
+            const videoId = extractYouTubeId(validatedData.videoUrl)
+            if (videoId) {
+                thumbnail = getYouTubeThumbnail(videoId)
+            }
+        } else if (videoSource === 'GOOGLE_DRIVE') {
+            // Use the custom Google Drive video placeholder
+            thumbnail = '/thumbnails/google-drive-placeholder.png'
+        }
+
         const content = await prisma.content.create({
-            data: validatedData
+            data: {
+                ...validatedData,
+                videoSource,
+                thumbnail
+            }
         })
 
         return NextResponse.json(content, { status: 201 })

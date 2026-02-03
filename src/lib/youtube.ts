@@ -5,9 +5,14 @@
  * - https://youtu.be/VIDEO_ID
  * - https://www.youtube.com/embed/VIDEO_ID
  */
-export function extractYouTubeId(url: string): string | null {
+export function extractYouTubeId(url: string | null | undefined): string | null {
+    // Safety check for undefined/null URLs
+    if (!url) {
+        return null;
+    }
+
     const patterns = [
-        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\?\/]+)/,
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([^&\?\/]+)/,
         /^([a-zA-Z0-9_-]{11})$/ // Direct video ID
     ]
 

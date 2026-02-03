@@ -51,7 +51,9 @@ interface Content {
     id: string
     title: string
     description: string
-    youtubeUrl: string
+    videoUrl: string
+    videoSource: 'YOUTUBE' | 'GOOGLE_DRIVE' | 'DIRECT_UPLOAD'
+    thumbnail?: string | null
     createdAt: string
     moduleId: string
 }
@@ -92,8 +94,34 @@ function useDebounceValue<T>(value: T, delay: number): T {
     return debouncedValue
 }
 
-function VideoThumbnail({ url, title }: { url: string, title: string }) {
+function VideoThumbnail({ url, title, thumbnail }: { url: string, title: string, thumbnail?: string | null }) {
     const [error, setError] = useState(false)
+
+    // If we have a stored thumbnail, use it
+    if (thumbnail && !error) {
+        return (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+                src={thumbnail}
+                alt={`Thumbnail for ${title}`}
+                className="h-full w-full object-cover"
+                onError={() => setError(true)}
+            />
+        )
+    }
+
+    // Google Drive fallback (if no thumbnail is stored)
+    if (url.includes('drive.google.com')) {
+        return (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+                src="/thumbnails/google-drive-placeholder.png"
+                alt={`Thumbnail for ${title}`}
+                className="h-full w-full object-cover"
+            />
+        )
+    }
+
     const videoId = extractYouTubeId(url)
 
     if (!videoId || error) {
@@ -132,7 +160,7 @@ export function ContentManagement() {
     const [lessonDialog, setLessonDialog] = useState(false)
     const [editingLesson, setEditingLesson] = useState<Content | null>(null)
     const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null)
-    const [lessonFormData, setLessonFormData] = useState({ title: "", description: "", youtubeUrl: "" })
+    const [lessonFormData, setLessonFormData] = useState({ title: "", description: "", videoUrl: "" })
 
     // Expanded State
     const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({})
@@ -212,7 +240,7 @@ export function ContentManagement() {
     const handleCreateLesson = (moduleId: string) => {
         setSelectedModuleId(moduleId)
         setEditingLesson(null)
-        setLessonFormData({ title: "", description: "", youtubeUrl: "" })
+        setLessonFormData({ title: "", description: "", videoUrl: "" })
         setLessonDialog(true)
     }
 
@@ -222,7 +250,7 @@ export function ContentManagement() {
         setLessonFormData({
             title: lesson.title,
             description: lesson.description,
-            youtubeUrl: lesson.youtubeUrl
+            videoUrl: lesson.videoUrl
         })
         setLessonDialog(true)
     }
@@ -231,14 +259,14 @@ export function ContentManagement() {
         try {
             if (!selectedModuleId) return
 
-            let url = lessonFormData.youtubeUrl.trim()
+            let url = lessonFormData.videoUrl.trim()
             if (url && !url.startsWith("http://") && !url.startsWith("https://")) {
                 url = `https://${url}`
             }
 
             const payload = {
                 ...lessonFormData,
-                youtubeUrl: url,
+                videoUrl: url,
                 moduleId: selectedModuleId
             }
 
@@ -394,7 +422,7 @@ export function ContentManagement() {
                                                                         {module.content.map((lesson) => (
                                                                             <div key={lesson.id} className="flex items-center gap-3 p-3 rounded-lg border bg-background/60 hover:border-primary/30 transition-all group/lesson">
                                                                                 <div className="relative h-10 w-16 shrink-0 rounded overflow-hidden bg-muted">
-                                                                                    <VideoThumbnail url={lesson.youtubeUrl} title={lesson.title} />
+                                                                                    <VideoThumbnail url={lesson.videoUrl} title={lesson.title} thumbnail={lesson.thumbnail} />
                                                                                 </div>
                                                                                 <div className="flex-1 min-w-0">
                                                                                     <div className="font-medium text-sm truncate">{lesson.title}</div>
@@ -529,12 +557,15 @@ export function ContentManagement() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>YouTube URL</Label>
+                            <Label>Video URL</Label>
                             <Input
-                                placeholder="https://youtube.com/..."
-                                value={lessonFormData.youtubeUrl}
-                                onChange={(e) => setLessonFormData({ ...lessonFormData, youtubeUrl: e.target.value })}
+                                placeholder="https://youtube.com/... or https://drive.google.com/..."
+                                value={lessonFormData.videoUrl}
+                                onChange={(e) => setLessonFormData({ ...lessonFormData, videoUrl: e.target.value })}
                             />
+                            <p className="text-xs text-muted-foreground">
+                                Supported sources: YouTube and Google Drive
+                            </p>
                         </div>
                     </div>
                     <DialogFooter>

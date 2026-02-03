@@ -47,7 +47,7 @@ interface Module {
     title: string
     description: string
     createdAt: string
-    content: { youtubeUrl: string }[]
+    content: { videoUrl: string; videoSource?: string }[]
 }
 
 interface Meta {
@@ -501,7 +501,7 @@ export default function DashboardPage() {
                                     {/* Banner Image */}
                                     <div className="relative h-48 w-full bg-muted overflow-hidden">
                                         <ModuleBanner
-                                            url={module.content && module.content.length > 0 ? module.content[0].youtubeUrl : undefined}
+                                            url={module.content && module.content.length > 0 ? module.content[0].videoUrl : undefined}
                                             title={module.title}
                                         />
                                     </div>
