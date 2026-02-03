@@ -4,6 +4,8 @@ import { useEffect } from "react"
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
+import { siteConfig } from "@/config/site-config"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Users, FileVideo, LogOut, LayoutDashboard, Tags } from "lucide-react"
@@ -48,11 +50,22 @@ export default function AdminPage() {
             <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
                 <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                     <Link href="/admin" className="flex items-center gap-2 group">
-                        <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-red-500 to-orange-500 flex items-center justify-center text-white font-bold shadow-lg shadow-red-500/20 group-hover:shadow-red-500/40 transition-all duration-300">
-                            AD
-                        </div>
+                        {siteConfig.logoImage ? (
+                            <div className="relative h-8 w-8 rounded-xl overflow-hidden shadow-lg shadow-red-500/20 group-hover:shadow-red-500/40 transition-all duration-300">
+                                <Image
+                                    src={siteConfig.logoImage}
+                                    alt={siteConfig.name}
+                                    fill
+                                    className="object-cover"
+                                />
+                            </div>
+                        ) : (
+                            <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-red-500 to-orange-500 flex items-center justify-center text-white font-bold shadow-lg shadow-red-500/20 group-hover:shadow-red-500/40 transition-all duration-300">
+                                AD
+                            </div>
+                        )}
                         <span className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                            Admin <span className="text-primary">Panel</span>
+                            {siteConfig.name} <span className="text-primary">Admin</span>
                         </span>
                     </Link>
 

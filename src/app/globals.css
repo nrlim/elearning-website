@@ -115,6 +115,85 @@
   --sidebar-ring: oklch(0.65 0.22 265);
 }
 
+/* Tenant: corporate-training (SkillFlow) - Professional Orange Theme */
+:root[data-tenant="corporate-training"] {
+  --primary: oklch(0.6 0.18 45);
+  /* Orange */
+  --primary-foreground: oklch(0.985 0 0);
+  --radius: 0.25rem;
+  /* Sharper corners */
+  --ring: oklch(0.6 0.18 45);
+}
+
+.dark[data-tenant="corporate-training"] {
+  --primary: oklch(0.65 0.18 45);
+  --ring: oklch(0.65 0.18 45);
+}
+
+/* 1. Vesper Crypto - Premium Red/Dark */
+:root[data-tenant="vesper-crypto"] {
+  --primary: oklch(0.6 0.22 27);
+  /* Bold Red */
+  --primary-foreground: oklch(0.985 0 0);
+  --radius: 0.75rem;
+  --ring: oklch(0.6 0.22 27);
+}
+
+.dark[data-tenant="vesper-crypto"] {
+  --background: oklch(0.12 0.03 27);
+  /* Deep Dark Red tint */
+  --primary: oklch(0.65 0.22 27);
+  /* Lighter Red for dark mode */
+  --sidebar: oklch(0.10 0.03 27);
+  /* Darker sidebar */
+}
+
+/* 2. TechInstitute - Cyan/Teal Modern */
+:root[data-tenant="tech-institute"] {
+  --primary: oklch(0.6 0.18 190);
+  /* Cyan */
+  --radius: 0.25rem;
+  --ring: oklch(0.6 0.18 190);
+}
+
+/* 3. FinancePro - Emerald Green */
+:root[data-tenant="finance-pro"] {
+  --primary: oklch(0.55 0.15 145);
+  /* Emerald */
+  --radius: 0.125rem;
+  /* Formal */
+  --ring: oklch(0.55 0.15 145);
+}
+
+/* 4. CreativeAcademy - Vibrant Pink */
+:root[data-tenant="creative-academy"] {
+  --primary: oklch(0.65 0.25 330);
+  /* Hot Pink */
+  --radius: 1.5rem;
+  /* Very rounded */
+  --ring: oklch(0.65 0.25 330);
+  --font-sans: "Outfit", sans-serif;
+  /* Implied if available, otherwise fallback */
+}
+
+/* 5. SecureNet - Slate/Tech Blue */
+:root[data-tenant="secure-net"] {
+  --primary: oklch(0.6 0.15 240);
+  /* Tech Blue */
+  --destructive: oklch(0.6 0.2 20);
+  --radius: 0rem;
+  /* Boxy/Terminal style */
+  --ring: oklch(0.6 0.15 240);
+}
+
+.dark[data-tenant="secure-net"] {
+  --background: oklch(0.1 0 0);
+  /* Pure Black */
+  --card: oklch(0.15 0 0);
+  --border: oklch(0.3 0 0);
+  --primary: oklch(0.6 0.15 240);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

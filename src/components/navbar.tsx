@@ -1,5 +1,6 @@
 "use client"
 
+import { siteConfig } from "@/config/site-config"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { LoginModal } from "@/components/login-modal"
@@ -14,7 +15,7 @@ export function Navbar() {
                     <div className="relative">
                         <div className="absolute inset-0 bg-gradient-to-r from-primary to-purple-400 blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
                         <span className="relative text-2xl font-black bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
-                            CryptoLearn
+                            {siteConfig.logoText}
                         </span>
                     </div>
                 </Link>
@@ -47,7 +48,7 @@ export function Navbar() {
                             <SheetContent side="right">
                                 <SheetHeader>
                                     <SheetTitle className="text-left font-black bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
-                                        CryptoLearn
+                                        {siteConfig.logoText}
                                     </SheetTitle>
                                 </SheetHeader>
                                 <div className="flex flex-col space-y-6 pt-6">

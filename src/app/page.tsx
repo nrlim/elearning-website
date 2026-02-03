@@ -1,4 +1,5 @@
 import { Navbar } from "@/components/navbar";
+import { siteConfig } from "@/config/site-config";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
@@ -92,7 +93,7 @@ export default function Home() {
             <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
               <div className="max-w-xl space-y-4">
                 <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
-                  Why learn with <span className="text-primary">CryptoLearn</span>?
+                  Why learn with <span className="text-primary">{siteConfig.name}</span>?
                 </h2>
                 <p className="text-muted-foreground text-lg">
                   We provide the most comprehensive curriculum designed for the modern web.
@@ -323,7 +324,7 @@ export default function Home() {
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             <div className="space-y-4">
-              <h3 className="text-lg font-bold">CryptoLearn</h3>
+              <h3 className="text-lg font-bold">{siteConfig.name}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Empowering the next generation of developers and crypto enthusiasts through world-class education.
               </p>
@@ -358,7 +359,7 @@ export default function Home() {
           </div>
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-border/50">
             <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} CryptoLearn Inc. All rights reserved.
+              © {new Date().getFullYear()} {siteConfig.name} Inc. All rights reserved.
             </p>
             <div className="flex gap-4">
               {/* Social icons would go here */}

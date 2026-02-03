@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from "react"
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
+import { siteConfig } from "@/config/site-config"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -255,11 +257,22 @@ export default function DashboardPage() {
                 <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-6">
                         <Link href="/dashboard" className="flex items-center gap-2 group">
-                            <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-primary to-purple-500 flex items-center justify-center text-primary-foreground font-bold shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-all duration-300">
-                                CL
-                            </div>
+                            {siteConfig.logoImage ? (
+                                <div className="relative h-8 w-8 rounded-xl overflow-hidden shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-all duration-300">
+                                    <Image
+                                        src={siteConfig.logoImage}
+                                        alt={siteConfig.name}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                </div>
+                            ) : (
+                                <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-primary to-purple-500 flex items-center justify-center text-primary-foreground font-bold shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-all duration-300">
+                                    {siteConfig.name.substring(0, 2).toUpperCase()}
+                                </div>
+                            )}
                             <span className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                                CryptoLearn
+                                {siteConfig.name}
                             </span>
                         </Link>
 
