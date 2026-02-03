@@ -92,7 +92,12 @@ export async function GET(req: Request) {
                     createdAt: 'desc'
                 },
                 include: {
-                    content: true, // Include parts/lessons
+                    content: {
+                        orderBy: [
+                            { order: 'asc' },
+                            { createdAt: 'asc' }
+                        ]
+                    }, // Include parts/lessons
                     type: true, // Include module type
                 }
             }),

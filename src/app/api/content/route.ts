@@ -40,9 +40,10 @@ export async function GET(req: Request) {
                 where,
                 skip,
                 take: limit,
-                orderBy: {
-                    createdAt: 'asc' // Order parts chronologically usually
-                }
+                orderBy: [
+                    { order: 'asc' },
+                    { createdAt: 'asc' }
+                ]
             }),
             prisma.content.count({ where })
         ])
@@ -119,11 +120,20 @@ export async function POST(req: Request) {
             thumbnail = '/thumbnails/google-drive-placeholder.png'
         }
 
+        // Get the next order number for this module
+        const lastContent = await prisma.content.findFirst({
+            where: { moduleId: validatedData.moduleId },
+            orderBy: { order: 'desc' },
+            select: { order: true }
+        })
+        const nextOrder = (lastContent?.order ?? 0) + 1
+
         const content = await prisma.content.create({
             data: {
                 ...validatedData,
                 videoSource,
-                thumbnail
+                thumbnail,
+                order: nextOrder
             }
         })
 

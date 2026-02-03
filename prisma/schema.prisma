@@ -48,6 +48,7 @@ model Content {
   videoSource VideoSource @default(YOUTUBE)
   thumbnail   String?     // Optional thumbnail URL
   duration    Int?        // Video duration in seconds
+  order       Int         @default(0)
   moduleId    String
   module      Module      @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   createdAt   DateTime    @default(now())

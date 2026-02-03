@@ -46,6 +46,24 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import axios from "axios"
 import { extractYouTubeId, getYouTubeThumbnailUrl } from "@/lib/youtube"
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+    useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { GripVertical } from "lucide-react";
 
 interface Content {
     id: string
@@ -56,6 +74,7 @@ interface Content {
     thumbnail?: string | null
     createdAt: string
     moduleId: string
+    order?: number
 }
 
 interface Module {
@@ -143,6 +162,44 @@ function VideoThumbnail({ url, title, thumbnail }: { url: string, title: string,
     )
 }
 
+function SortableLessonItem({ lesson, onEdit, onDelete }: { lesson: Content, onEdit: (l: Content) => void, onDelete: (id: string) => void }) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+    } = useSortable({ id: lesson.id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    };
+
+    return (
+        <div ref={setNodeRef} style={style} className="flex items-center gap-3 p-3 rounded-lg border bg-background/60 hover:border-primary/30 transition-all group/lesson">
+            <div {...attributes} {...listeners} className="cursor-grab hover:text-primary text-muted-foreground">
+                <GripVertical className="h-4 w-4" />
+            </div>
+            <div className="relative h-10 w-16 shrink-0 rounded overflow-hidden bg-muted">
+                <VideoThumbnail url={lesson.videoUrl} title={lesson.title} thumbnail={lesson.thumbnail} />
+            </div>
+            <div className="flex-1 min-w-0">
+                <div className="font-medium text-sm truncate">{lesson.title}</div>
+                <div className="text-xs text-muted-foreground truncate">{lesson.description}</div>
+            </div>
+            <div className="flex items-center gap-1 opacity-0 group-hover/lesson:opacity-100 transition-opacity">
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(lesson)}>
+                    <Pencil className="h-3 w-3" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => onDelete(lesson.id)}>
+                    <Trash2 className="h-3 w-3" />
+                </Button>
+            </div>
+        </div>
+    );
+}
+
 export function ContentManagement() {
     const [modules, setModules] = useState<Module[]>([])
     const [meta, setMeta] = useState<Meta | null>(null)
@@ -166,6 +223,13 @@ export function ContentManagement() {
     const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({})
 
     const debouncedSearch = useDebounceValue(searchQuery, 500)
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
 
     const fetchModules = useCallback(async () => {
         try {
@@ -299,6 +363,43 @@ export function ContentManagement() {
         }
     }
 
+    const handleDragEnd = async (event: DragEndEvent, moduleId: string) => {
+        const { active, over } = event;
+
+        if (over && active.id !== over.id) {
+            setModules((items) => {
+                const moduleIndex = items.findIndex(m => m.id === moduleId);
+                if (moduleIndex === -1) return items;
+
+                const module = items[moduleIndex];
+                const oldIndex = module.content.findIndex((c) => c.id === active.id);
+                const newIndex = module.content.findIndex((c) => c.id === over.id);
+
+                const newContent = arrayMove(module.content, oldIndex, newIndex);
+
+                // Update order numbers locally
+                const updatedContent = newContent.map((item, index) => ({
+                    ...item,
+                    order: index + 1
+                }));
+
+                // Update state
+                const newModules = [...items];
+                newModules[moduleIndex] = {
+                    ...module,
+                    content: updatedContent
+                };
+
+                // Send to backend
+                axios.put('/api/content/reorder', {
+                    items: updatedContent.map(item => ({ id: item.id, order: item.order }))
+                }).catch(err => console.error("Failed to reorder", err));
+
+                return newModules;
+            });
+        }
+    };
+
 
 
     return (
@@ -419,25 +520,25 @@ export function ContentManagement() {
                                                                     </div>
                                                                 ) : (
                                                                     <div className="grid gap-2">
-                                                                        {module.content.map((lesson) => (
-                                                                            <div key={lesson.id} className="flex items-center gap-3 p-3 rounded-lg border bg-background/60 hover:border-primary/30 transition-all group/lesson">
-                                                                                <div className="relative h-10 w-16 shrink-0 rounded overflow-hidden bg-muted">
-                                                                                    <VideoThumbnail url={lesson.videoUrl} title={lesson.title} thumbnail={lesson.thumbnail} />
-                                                                                </div>
-                                                                                <div className="flex-1 min-w-0">
-                                                                                    <div className="font-medium text-sm truncate">{lesson.title}</div>
-                                                                                    <div className="text-xs text-muted-foreground truncate">{lesson.description}</div>
-                                                                                </div>
-                                                                                <div className="flex items-center gap-1 opacity-0 group-hover/lesson:opacity-100 transition-opacity">
-                                                                                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEditLesson(lesson)}>
-                                                                                        <Pencil className="h-3 w-3" />
-                                                                                    </Button>
-                                                                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDeleteLesson(lesson.id)}>
-                                                                                        <Trash2 className="h-3 w-3" />
-                                                                                    </Button>
-                                                                                </div>
-                                                                            </div>
-                                                                        ))}
+                                                                        <DndContext
+                                                                            sensors={sensors}
+                                                                            collisionDetection={closestCenter}
+                                                                            onDragEnd={(event) => handleDragEnd(event, module.id)}
+                                                                        >
+                                                                            <SortableContext
+                                                                                items={module.content}
+                                                                                strategy={verticalListSortingStrategy}
+                                                                            >
+                                                                                {module.content.map((lesson) => (
+                                                                                    <SortableLessonItem
+                                                                                        key={lesson.id}
+                                                                                        lesson={lesson}
+                                                                                        onEdit={handleEditLesson}
+                                                                                        onDelete={handleDeleteLesson}
+                                                                                    />
+                                                                                ))}
+                                                                            </SortableContext>
+                                                                        </DndContext>
                                                                     </div>
                                                                 )}
                                                             </div>

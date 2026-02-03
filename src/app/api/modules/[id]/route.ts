@@ -20,7 +20,10 @@ export async function GET(
             where: { id: id },
             include: {
                 content: {
-                    orderBy: { createdAt: 'asc' }
+                    orderBy: [
+                        { order: 'asc' },
+                        { createdAt: 'asc' }
+                    ]
                 },
                 type: true,
             }
