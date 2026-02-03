@@ -35,7 +35,7 @@ export async function GET(req: Request) {
     // 1. First, determine what the user is ALLOWED to see
     let allowedTypeIds: string[] | null = null // null means all keys (admin)
 
-    if (session && session.user.role !== "ADMIN") {
+    if (session && session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN") {
         const user = await prisma.user.findUnique({
             where: { email: session.user.email! },
             include: { moduleTypes: true }
@@ -117,7 +117,7 @@ export async function POST(req: Request) {
     try {
         const session = await getServerSession(authOptions)
 
-        if (!session || session.user.role !== "ADMIN") {
+        if (!session || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
 

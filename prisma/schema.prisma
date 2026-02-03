@@ -53,6 +53,7 @@ model Content {
 enum Role {
   USER
   ADMIN
+  SUPERADMIN
 }
 
 enum UserStatus {

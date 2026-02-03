@@ -8,11 +8,16 @@ export async function GET() {
     try {
         const session = await getServerSession(authOptions)
 
-        if (!session || session.user.role !== "ADMIN") {
+        if (!session || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
 
         const users = await prisma.user.findMany({
+            where: {
+                role: {
+                    not: "SUPERADMIN"
+                }
+            },
             select: {
                 id: true,
                 name: true,

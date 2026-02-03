@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 export default withAuth(
     function middleware(req) {
         // 1. Admin Access Check
-        if (req.nextUrl.pathname.startsWith("/admin") && req.nextauth.token?.role !== "ADMIN") {
+        if (req.nextUrl.pathname.startsWith("/admin") && req.nextauth.token?.role !== "ADMIN" && req.nextauth.token?.role !== "SUPERADMIN") {
             return NextResponse.redirect(new URL("/dashboard", req.url))
         }
 

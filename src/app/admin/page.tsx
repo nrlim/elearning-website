@@ -20,7 +20,7 @@ export default function AdminPage() {
     useEffect(() => {
         if (status === "unauthenticated") {
             router.push("/?login=true")
-        } else if (status === "authenticated" && session?.user?.role !== "ADMIN") {
+        } else if (status === "authenticated" && session?.user?.role !== "ADMIN" && session?.user?.role !== "SUPERADMIN") {
             router.push("/dashboard")
         }
     }, [status, session, router])
@@ -40,7 +40,7 @@ export default function AdminPage() {
         )
     }
 
-    if (session?.user?.role !== "ADMIN") {
+    if (session?.user?.role !== "ADMIN" && session?.user?.role !== "SUPERADMIN") {
         return null
     }
 

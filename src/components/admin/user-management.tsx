@@ -11,6 +11,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
+import { siteConfig } from "@/config/site-config"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -22,14 +23,15 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Pencil, Trash2, Plus, Eye, EyeOff } from "lucide-react"
+import { Pencil, Trash2, Plus, Eye, EyeOff, FileDown } from "lucide-react"
 import axios from "axios"
+import { useSession } from "next-auth/react"
 
 interface User {
     id: string
     name: string
     email: string
-    role: "USER" | "ADMIN"
+    role: "USER" | "ADMIN" | "SUPERADMIN"
     createdAt: string
     moduleTypes?: { id: string; name: string }[]
     status: "ACTIVE" | "INACTIVE"
@@ -45,7 +47,7 @@ export function UserManagement() {
     const [moduleTypes, setModuleTypes] = useState<{ id: string, name: string }[]>([])
     const [formData, setFormData] = useState({
         name: "",
-        role: "USER" as "USER" | "ADMIN",
+        role: "USER" as "USER" | "ADMIN" | "SUPERADMIN",
         moduleTypeIds: [] as string[],
         status: "ACTIVE" as "ACTIVE" | "INACTIVE",
         isTrial: false,
@@ -57,11 +59,14 @@ export function UserManagement() {
         name: "",
         email: "",
         password: "",
-        role: "USER" as "USER" | "ADMIN",
+        role: "USER" as "USER" | "ADMIN" | "SUPERADMIN",
         moduleTypeIds: [] as string[],
         isTrial: false,
         trialEndsAt: "" as string
     })
+    const { data: session } = useSession()
+    const [reportDialog, setReportDialog] = useState(false)
+    const [reportDate, setReportDate] = useState({ month: new Date().getMonth() + 1, year: new Date().getFullYear() })
 
     useEffect(() => {
         fetchUsers()
@@ -154,6 +159,152 @@ export function UserManagement() {
         }
     }
 
+    const handleGenerateReport = async () => {
+        try {
+            // Dynamically import jsPDF to avoid SSR issues
+            const jsPDF = (await import("jspdf")).default
+            const autoTable = (await import("jspdf-autotable")).default
+
+            const { data } = await axios.get(`/api/reports/users?month=${reportDate.month}&year=${reportDate.year}`)
+
+            if (!data || data.length === 0) {
+                alert("No users found for this period")
+                return
+            }
+
+            const doc = new jsPDF()
+
+            // --- Stats Calculation ---
+            const totalUsers = data.length
+            const activeUsers = data.filter((u: any) => u.status === "ACTIVE").length
+            const adminCount = data.filter((u: any) => u.role === "ADMIN").length
+            const userCount = totalUsers - adminCount
+
+            // Define Month Name
+            const monthName = new Date(0, reportDate.month - 1).toLocaleString('default', { month: 'long' })
+
+            // --- Header Design ---
+            const pageWidth = doc.internal.pageSize.width
+
+            // Background Header Bar (Primary Color - Dark Blue-ish)
+            doc.setFillColor(30, 41, 59) // Slate-900 like
+            doc.rect(0, 0, pageWidth, 40, 'F')
+
+            // Site Name (Tenant) - Left
+            doc.setFontSize(22)
+            doc.setTextColor(255, 255, 255)
+            doc.setFont("helvetica", "bold")
+            doc.text(siteConfig.name, 14, 20)
+
+            // Report Title - Right
+            doc.setFontSize(16)
+            doc.setFont("helvetica", "normal")
+            doc.setTextColor(200, 200, 200)
+            doc.text("User Registration Report", pageWidth - 14, 20, { align: 'right' })
+
+            // Period & Generated Info - Left (Sub header)
+            doc.setFontSize(10)
+            doc.setTextColor(200, 200, 200)
+            doc.text(`Period: ${monthName} ${reportDate.year}`, 14, 30)
+            doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth - 14, 30, { align: 'right' })
+
+            // --- Executive Summary Section ---
+            const summaryStartY = 50
+            const boxHeight = 28
+
+            // Draw a light gray box for the summary background with border
+            doc.setFillColor(248, 250, 252) // slate-50
+            doc.setDrawColor(226, 232, 240) // slate-200
+            doc.roundedRect(14, summaryStartY, pageWidth - 28, boxHeight, 3, 3, 'FD')
+
+            // Metric 1: Total Registrations
+            doc.setFontSize(8)
+            doc.setFont("helvetica", "bold")
+            doc.setTextColor(100, 116, 139) // Slate-500
+            doc.text("TOTAL NEW USERS", 24, summaryStartY + 10)
+
+            doc.setFontSize(16)
+            doc.setTextColor(15, 23, 42) // Slate-900
+            doc.text(String(totalUsers), 24, summaryStartY + 20)
+
+            // Divider 1
+            doc.setDrawColor(226, 232, 240)
+            doc.line(70, summaryStartY + 6, 70, summaryStartY + 22)
+
+            // Metric 2: Active Accounts
+            doc.setFontSize(8)
+            doc.setTextColor(100, 116, 139)
+            doc.text("ACTIVE ACCOUNTS", 80, summaryStartY + 10)
+
+            doc.setFontSize(16)
+            doc.setTextColor(15, 23, 42)
+            doc.text(String(activeUsers), 80, summaryStartY + 20)
+
+            // Divider 2
+            doc.line(130, summaryStartY + 6, 130, summaryStartY + 22)
+
+            // Metric 3: Role Breakdown
+            doc.setFontSize(8)
+            doc.setTextColor(100, 116, 139)
+            doc.text("ROLE DISTRIBUTION", 140, summaryStartY + 10)
+
+            doc.setFontSize(11)
+            doc.setTextColor(15, 23, 42)
+            doc.text(`Students: ${userCount}`, 140, summaryStartY + 19)
+            doc.setTextColor(100, 116, 139) // Muted for second line
+            doc.setFontSize(9)
+            doc.text(`Admins: ${adminCount}`, 175, summaryStartY + 19) // Inline next to it or below? Let's put it next, bit smaller
+
+            // Table Columns
+            const tableColumn = ["Name", "Email", "Role", "Status", "Joined Date", "Modules"]
+
+            // Table Rows
+            const tableRows = data.map((u: any) => [
+                u.name,
+                u.email,
+                u.role,
+                u.status,
+                new Date(u.createdAt).toLocaleDateString(),
+                u.moduleTypes?.map((t: any) => t.name).join(", ") || "-"
+            ])
+
+            // Generate Table
+            autoTable(doc, {
+                head: [tableColumn],
+                body: tableRows,
+                startY: summaryStartY + boxHeight + 10, // Dynamic start relative to summary
+                theme: 'grid',
+                styles: {
+                    fontSize: 9,
+                    cellPadding: 4,
+                    lineColor: [220, 220, 220],
+                    lineWidth: 0.1,
+                },
+                headStyles: {
+                    fillColor: [30, 41, 59],
+                    textColor: [255, 255, 255],
+                    fontStyle: 'bold',
+                    halign: 'left'
+                },
+                alternateRowStyles: {
+                    fillColor: [248, 250, 252]
+                },
+                columnStyles: {
+                    0: { fontStyle: 'bold', cellWidth: 40 }, // Name
+                    1: { cellWidth: 50 }, // Email
+                    5: { cellWidth: 'auto' } // Modules
+                }
+            })
+
+            // Save PDF
+            doc.save(`users_report_${reportDate.year}_${reportDate.month}.pdf`)
+            setReportDialog(false)
+        } catch (error) {
+            console.error("Failed to generate report", error)
+            alert("Failed to generate report")
+        }
+    }
+
     if (loading) {
         return <div className="text-muted-foreground">Loading users...</div>
     }
@@ -161,7 +312,13 @@ export function UserManagement() {
     return (
         <>
             <div className="flex flex-col gap-4">
-                <div className="flex justify-end">
+                <div className="flex justify-end gap-2">
+                    {session?.user?.role === "SUPERADMIN" && (
+                        <Button onClick={() => setReportDialog(true)} variant="outline" className="gap-2 border-primary/20 hover:bg-primary/5 text-primary">
+                            <FileDown className="h-4 w-4" />
+                            Generate Report
+                        </Button>
+                    )}
                     <Button onClick={() => setCreateDialog(true)} className="gap-2 shadow-lg shadow-primary/20">
                         <Plus className="h-4 w-4" />
                         Add User
@@ -448,6 +605,48 @@ export function UserManagement() {
                             Cancel
                         </Button>
                         <Button onClick={handleCreate}>Create User</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Report Dialog */}
+            <Dialog open={reportDialog} onOpenChange={setReportDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Generate User Report</DialogTitle>
+                        <DialogDescription>Select month and year to generate report for non-trial users.</DialogDescription>
+                    </DialogHeader>
+                    <div className="grid grid-cols-2 gap-4 py-4">
+                        <div className="space-y-2">
+                            <Label>Month</Label>
+                            <select
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                                value={reportDate.month}
+                                onChange={(e) => setReportDate({ ...reportDate, month: parseInt(e.target.value) })}
+                            >
+                                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                                    <option key={m} value={m}>
+                                        {new Date(0, m - 1).toLocaleString('default', { month: 'long' })}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Year</Label>
+                            <select
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                                value={reportDate.year}
+                                onChange={(e) => setReportDate({ ...reportDate, year: parseInt(e.target.value) })}
+                            >
+                                {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map((y) => (
+                                    <option key={y} value={y}>{y}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setReportDialog(false)}>Cancel</Button>
+                        <Button onClick={handleGenerateReport}>Download Report</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

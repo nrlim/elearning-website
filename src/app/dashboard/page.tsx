@@ -168,8 +168,8 @@ export default function DashboardPage() {
                     const userData = res.data
                     let types = userData.moduleTypes || []
 
-                    // If user is ADMIN, fetch all available module types
-                    if (userData.role === "ADMIN") {
+                    // If user is ADMIN or SUPERADMIN, fetch all available module types
+                    if (userData.role === "ADMIN" || userData.role === "SUPERADMIN") {
                         try {
                             const allTypesRes = await axios.get("/api/module-types")
                             types = allTypesRes.data
@@ -328,7 +328,7 @@ export default function DashboardPage() {
                         </div>
                         <div className="h-8 w-px bg-border/60 mx-1 hidden md:block" />
 
-                        {session?.user?.role === "ADMIN" && (
+                        {(session?.user?.role === "ADMIN" || session?.user?.role === "SUPERADMIN") && (
                             <Link href="/admin">
                                 <Button variant="ghost" size="sm" className="hidden md:flex items-center gap-2 hover:bg-primary/10 hover:text-primary">
                                     <Shield className="h-4 w-4" />
@@ -364,7 +364,7 @@ export default function DashboardPage() {
                                     </div>
 
                                     <div className="flex flex-col gap-2">
-                                        {session?.user?.role === "ADMIN" && (
+                                        {(session?.user?.role === "ADMIN" || session?.user?.role === "SUPERADMIN") && (
                                             <Link href="/admin" onClick={() => { }}>
                                                 <Button variant="ghost" className="w-full justify-start gap-2">
                                                     <Shield className="h-4 w-4" />
