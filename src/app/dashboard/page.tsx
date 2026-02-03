@@ -16,7 +16,11 @@ import {
     BookOpen,
     PlayCircle,
     ChevronDown,
-    Shield
+    Shield,
+    Menu,
+    Filter,
+    X,
+    User
 } from "lucide-react"
 import axios from "axios"
 import {
@@ -27,6 +31,13 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/components/ui/sheet"
 import { extractYouTubeId, getYouTubeThumbnailUrl } from "@/lib/youtube"
 
 interface Module {
@@ -101,6 +112,7 @@ export default function DashboardPage() {
     const [page, setPage] = useState(1)
     const [userModuleTypes, setUserModuleTypes] = useState<{ id: string, name: string, description?: string }[]>([])
     const [selectedTypeId, setSelectedTypeId] = useState<string | null>(null)
+    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
 
     const debouncedSearch = useDebounceValue(searchQuery, 500)
 
@@ -150,8 +162,20 @@ export default function DashboardPage() {
     useEffect(() => {
         if (status === "authenticated") {
             axios.get("/api/user/me")
-                .then(res => {
-                    const types = res.data.moduleTypes || []
+                .then(async res => {
+                    const userData = res.data
+                    let types = userData.moduleTypes || []
+
+                    // If user is ADMIN, fetch all available module types
+                    if (userData.role === "ADMIN") {
+                        try {
+                            const allTypesRes = await axios.get("/api/module-types")
+                            types = allTypesRes.data
+                        } catch (err) {
+                            console.error("Failed to fetch all module types for admin", err)
+                        }
+                    }
+
                     setUserModuleTypes(types)
                     // If user has types, select the first one by default?
                     // Or let them see everything they are allowed to see first (which is the default behavior if no typeId is sent)
@@ -240,48 +264,47 @@ export default function DashboardPage() {
                         </Link>
 
                         {/* Module Type Dropdown (Desktop) */}
-                        {userModuleTypes.length > 0 && (
-                            <div className="hidden md:flex items-center border-l border-border/60 pl-6">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" className="flex items-center gap-2 font-medium">
-                                            {selectedTypeId
-                                                ? userModuleTypes.find(t => t.id === selectedTypeId)?.name
-                                                : "All Courses"}
-                                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="start" className="w-[240px]">
-                                        <DropdownMenuLabel>Select Program</DropdownMenuLabel>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem onClick={() => {
-                                            setSelectedTypeId(null)
-                                            setPage(1)
-                                        }} className="cursor-pointer">
-                                            All Courses
+                        <div className="hidden lg:flex items-center border-l border-border/60 pl-6">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="flex items-center gap-2 font-medium">
+                                        {selectedTypeId
+                                            ? userModuleTypes.find(t => t.id === selectedTypeId)?.name
+                                            : "All Courses"}
+                                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start" className="w-[240px]">
+                                    <DropdownMenuLabel>Select Program</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem onClick={() => {
+                                        setSelectedTypeId(null)
+                                        setPage(1)
+                                    }} className="cursor-pointer">
+                                        All Courses
+                                    </DropdownMenuItem>
+                                    {userModuleTypes.map(t => (
+                                        <DropdownMenuItem
+                                            key={t.id}
+                                            onClick={() => {
+                                                setSelectedTypeId(t.id)
+                                                setPage(1)
+                                            }}
+                                            className="cursor-pointer"
+                                        >
+                                            <div className="flex flex-col">
+                                                <span className="font-medium truncate">{t.name}</span>
+                                            </div>
+                                            {selectedTypeId === t.id && <ChevronDown className="ml-auto h-4 w-4 rotate-[-90deg]" />}
                                         </DropdownMenuItem>
-                                        {userModuleTypes.map(t => (
-                                            <DropdownMenuItem
-                                                key={t.id}
-                                                onClick={() => {
-                                                    setSelectedTypeId(t.id)
-                                                    setPage(1)
-                                                }}
-                                                className="cursor-pointer"
-                                            >
-                                                <div className="flex flex-col">
-                                                    <span className="font-medium truncate">{t.name}</span>
-                                                </div>
-                                                {selectedTypeId === t.id && <ChevronDown className="ml-auto h-4 w-4 rotate-[-90deg]" />}
-                                            </DropdownMenuItem>
-                                        ))}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
-                        )}
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-4">
+                        {/* Desktop User Info */}
                         <div className="hidden md:flex flex-col items-end">
                             <span className="text-sm font-medium text-foreground">
                                 {session?.user?.name}
@@ -294,15 +317,60 @@ export default function DashboardPage() {
 
                         {session?.user?.role === "ADMIN" && (
                             <Link href="/admin">
-                                <Button variant="ghost" size="sm" className="flex items-center gap-2 hover:bg-primary/10 hover:text-primary">
+                                <Button variant="ghost" size="sm" className="hidden md:flex items-center gap-2 hover:bg-primary/10 hover:text-primary">
                                     <Shield className="h-4 w-4" />
-                                    <span className="hidden sm:inline">Admin Panel</span>
+                                    <span>Admin Panel</span>
                                 </Button>
                             </Link>
                         )}
-                        <Button variant="ghost" size="icon" onClick={handleLogout} className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
+
+                        <Button variant="ghost" size="icon" onClick={handleLogout} className="hidden md:flex text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
                             <LogOut className="h-5 w-5" />
                         </Button>
+
+                        {/* Mobile Menu */}
+                        <Sheet>
+                            <SheetTrigger asChild>
+                                <Button variant="ghost" size="icon" className="md:hidden text-foreground">
+                                    <Menu className="h-5 w-5" />
+                                </Button>
+                            </SheetTrigger>
+                            <SheetContent side="right" className="w-[300px] sm:w-[350px]">
+                                <SheetHeader>
+                                    <SheetTitle>Menu</SheetTitle>
+                                </SheetHeader>
+                                <div className="flex flex-col gap-6 mt-6">
+                                    <div className="flex items-center gap-4 p-4 rounded-lg bg-secondary/50">
+                                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                            <User className="h-5 w-5 text-primary" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="font-medium">{session?.user?.name}</span>
+                                            <span className="text-xs text-muted-foreground">Student Account</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col gap-2">
+                                        {session?.user?.role === "ADMIN" && (
+                                            <Link href="/admin" onClick={() => { }}>
+                                                <Button variant="ghost" className="w-full justify-start gap-2">
+                                                    <Shield className="h-4 w-4" />
+                                                    Admin Panel
+                                                </Button>
+                                            </Link>
+                                        )}
+                                        <Button
+                                            variant="ghost"
+                                            className="w-full justify-start gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                            onClick={handleLogout}
+                                        >
+                                            <LogOut className="h-4 w-4" />
+                                            Logout
+                                        </Button>
+                                    </div>
+                                </div>
+                            </SheetContent>
+                        </Sheet>
                     </div>
                 </div>
             </header>
@@ -325,56 +393,67 @@ export default function DashboardPage() {
                         </p>
                     </div>
 
-                    <div className="relative w-full md:w-96 group">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                        <Input
-                            placeholder="Search modules..."
-                            className="pl-10 h-10 bg-secondary/50 border-transparent focus:bg-background focus:border-primary/50 transition-all duration-300"
-                            value={searchQuery}
-                            onChange={(e) => {
-                                setSearchQuery(e.target.value)
-                                setPage(1)
-                            }}
-                        />
+                    <div className="flex w-full md:w-auto gap-2">
+                        <div className="relative w-full md:w-96 group">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                            <Input
+                                placeholder="Search modules..."
+                                className="pl-10 h-10 bg-secondary/50 border-transparent focus:bg-background focus:border-primary/50 transition-all duration-300"
+                                value={searchQuery}
+                                onChange={(e) => {
+                                    setSearchQuery(e.target.value)
+                                    setPage(1)
+                                }}
+                            />
+                        </div>
+
+                        {/* Mobile Filter Button */}
+                        <Sheet open={isMobileFilterOpen} onOpenChange={setIsMobileFilterOpen}>
+                            <SheetTrigger asChild>
+                                <Button variant="outline" size="icon" className="lg:hidden h-10 w-10 shrink-0 border-border/40 bg-secondary/50">
+                                    <Filter className="h-4 w-4" />
+                                </Button>
+                            </SheetTrigger>
+                            <SheetContent side="bottom" className="h-[auto] max-h-[85vh] rounded-t-xl">
+                                <SheetHeader>
+                                    <SheetTitle>Select Program</SheetTitle>
+                                </SheetHeader>
+                                <div className="grid gap-2 py-4">
+                                    <Button
+                                        variant={selectedTypeId === null ? "secondary" : "ghost"}
+                                        className="w-full justify-start h-12 text-lg font-normal"
+                                        onClick={() => {
+                                            setSelectedTypeId(null)
+                                            setPage(1)
+                                            setIsMobileFilterOpen(false)
+                                        }}
+                                    >
+                                        All Courses
+                                        {selectedTypeId === null && <ChevronDown className="ml-auto h-4 w-4 rotate-[-90deg]" />}
+                                    </Button>
+                                    {userModuleTypes.map(t => (
+                                        <Button
+                                            key={t.id}
+                                            variant={selectedTypeId === t.id ? "secondary" : "ghost"}
+                                            className="w-full justify-start h-12 text-lg font-normal"
+                                            onClick={() => {
+                                                setSelectedTypeId(t.id)
+                                                setPage(1)
+                                                setIsMobileFilterOpen(false)
+                                            }}
+                                        >
+                                            {t.name}
+                                            {selectedTypeId === t.id && <ChevronDown className="ml-auto h-4 w-4 rotate-[-90deg]" />}
+                                        </Button>
+                                    ))}
+                                </div>
+                            </SheetContent>
+                        </Sheet>
                     </div>
                 </div>
 
                 {/* Mobile Module Selector (Fallback for small screens) */}
-                {userModuleTypes.length > 0 && (
-                    <div className="md:hidden">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full flex items-center justify-between h-12">
-                                    <span className="truncate flex items-center gap-2">
-                                        {selectedTypeId
-                                            ? userModuleTypes.find(t => t.id === selectedTypeId)?.name
-                                            : "All Courses"}
-                                    </span>
-                                    <ChevronDown className="h-4 w-4 opacity-50" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                                <DropdownMenuItem onClick={() => {
-                                    setSelectedTypeId(null)
-                                    setPage(1)
-                                }}>
-                                    All Courses
-                                </DropdownMenuItem>
-                                {userModuleTypes.map(t => (
-                                    <DropdownMenuItem
-                                        key={t.id}
-                                        onClick={() => {
-                                            setSelectedTypeId(t.id)
-                                            setPage(1)
-                                        }}
-                                    >
-                                        {t.name}
-                                    </DropdownMenuItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                )}
+
 
                 {/* Modules Grid */}
                 {loading ? (
@@ -465,6 +544,6 @@ export default function DashboardPage() {
                     </div>
                 )}
             </main>
-        </div>
+        </div >
     )
 }
