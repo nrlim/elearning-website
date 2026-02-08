@@ -33,7 +33,6 @@ interface User {
     email: string
     role: "USER" | "ADMIN" | "SUPERADMIN"
     createdAt: string
-    moduleTypes?: { id: string; name: string }[]
     status: "ACTIVE" | "INACTIVE"
     isTrial: boolean
     trialEndsAt?: string | null
@@ -44,11 +43,9 @@ export function UserManagement() {
     const [loading, setLoading] = useState(true)
     const [editingUser, setEditingUser] = useState<User | null>(null)
     const [editDialog, setEditDialog] = useState(false)
-    const [moduleTypes, setModuleTypes] = useState<{ id: string, name: string }[]>([])
     const [formData, setFormData] = useState({
         name: "",
         role: "USER" as "USER" | "ADMIN" | "SUPERADMIN",
-        moduleTypeIds: [] as string[],
         status: "ACTIVE" as "ACTIVE" | "INACTIVE",
         isTrial: false,
         trialEndsAt: "" as string
@@ -60,7 +57,6 @@ export function UserManagement() {
         email: "",
         password: "",
         role: "USER" as "USER" | "ADMIN" | "SUPERADMIN",
-        moduleTypeIds: [] as string[],
         isTrial: false,
         trialEndsAt: "" as string
     })
@@ -70,7 +66,6 @@ export function UserManagement() {
 
     useEffect(() => {
         fetchUsers()
-        axios.get("/api/module-types").then(res => setModuleTypes(res.data)).catch(err => console.error("Failed to fetch module types"))
     }, [])
 
     const fetchUsers = async () => {
@@ -89,7 +84,6 @@ export function UserManagement() {
         setFormData({
             name: user.name,
             role: user.role,
-            moduleTypeIds: user.moduleTypes?.map(t => t.id) || [],
             status: user.status,
             isTrial: user.isTrial,
             trialEndsAt: user.trialEndsAt ? new Date(user.trialEndsAt).toISOString().split('T')[0] : ""
@@ -117,7 +111,6 @@ export function UserManagement() {
             await axios.put(`/api/users/${user.id}`, {
                 name: user.name,
                 role: user.role,
-                moduleTypeIds: user.moduleTypes?.map(t => t.id) || [],
                 status: "ACTIVE",
                 isTrial: false,
                 trialEndsAt: null
@@ -138,7 +131,6 @@ export function UserManagement() {
                 email: "",
                 password: "",
                 role: "USER",
-                moduleTypeIds: [],
                 isTrial: false,
                 trialEndsAt: ""
             })
@@ -256,7 +248,7 @@ export function UserManagement() {
             doc.text(`Admins: ${adminCount}`, 175, summaryStartY + 19) // Inline next to it or below? Let's put it next, bit smaller
 
             // Table Columns
-            const tableColumn = ["Name", "Email", "Role", "Status", "Joined Date", "Modules"]
+            const tableColumn = ["Name", "Email", "Role", "Status", "Joined Date"]
 
             // Table Rows
             const tableRows = data.map((u: any) => [
@@ -265,7 +257,6 @@ export function UserManagement() {
                 u.role,
                 u.status,
                 new Date(u.createdAt).toLocaleDateString(),
-                u.moduleTypes?.map((t: any) => t.name).join(", ") || "-"
             ])
 
             // Generate Table
@@ -292,7 +283,6 @@ export function UserManagement() {
                 columnStyles: {
                     0: { fontStyle: 'bold', cellWidth: 40 }, // Name
                     1: { cellWidth: 50 }, // Email
-                    5: { cellWidth: 'auto' } // Modules
                 }
             })
 
@@ -363,15 +353,6 @@ export function UserManagement() {
                                                         <Badge variant={user.role === "ADMIN" ? "default" : "secondary"} className="shadow-sm w-fit">
                                                             {user.role}
                                                         </Badge>
-                                                        {user.moduleTypes && user.moduleTypes.length > 0 && (
-                                                            <div className="flex flex-wrap gap-1 mt-1">
-                                                                {user.moduleTypes.map(t => (
-                                                                    <span key={t.id} className="text-[10px] bg-primary/10 text-primary px-1.5 rounded">
-                                                                        {t.name}
-                                                                    </span>
-                                                                ))}
-                                                            </div>
-                                                        )}
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
@@ -443,25 +424,6 @@ export function UserManagement() {
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Module Access (Hold Ctrl to select multiple)</Label>
-                            <select
-                                multiple
-                                className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-                                value={formData.moduleTypeIds}
-                                onChange={(e) => {
-                                    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value)
-                                    setFormData({ ...formData, moduleTypeIds: selectedOptions })
-                                }}
-                            >
-                                {moduleTypes.map((type) => (
-                                    <option key={type.id} value={type.id}>
-                                        {type.name}
-                                    </option>
-                                ))}
-                            </select>
-                            <p className="text-xs text-muted-foreground">Select which module types this user can access.</p>
                         </div>
                         <div className="flex items-center space-x-2">
                             <input
@@ -558,24 +520,6 @@ export function UserManagement() {
                                 </Button>
                             </div>
                         </div>
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Module Access (Hold Ctrl to select multiple)</Label>
-                        <select
-                            multiple
-                            className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-                            value={createFormData.moduleTypeIds}
-                            onChange={(e) => {
-                                const selectedOptions = Array.from(e.target.selectedOptions, option => option.value)
-                                setCreateFormData({ ...createFormData, moduleTypeIds: selectedOptions })
-                            }}
-                        >
-                            {moduleTypes.map((type) => (
-                                <option key={type.id} value={type.id}>
-                                    {type.name}
-                                </option>
-                            ))}
-                        </select>
                     </div>
                     <div className="space-y-2">
                         <div className="flex items-center space-x-2 py-2">
