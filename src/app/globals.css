@@ -194,6 +194,44 @@
   --primary: oklch(0.6 0.15 240);
 }
 
+/* 6. Media Mirror ID / Phoenix - Vibrant Cyan Theme */
+:root[data-tenant="media-crypto"] {
+  --primary: oklch(0.68 0.18 200);
+  /* Bright Cyan - matches logo color #1DB4EC */
+  --primary-foreground: oklch(0.985 0 0);
+  --accent: oklch(0.75 0.15 195);
+  /* Lighter cyan accent */
+  --accent-foreground: oklch(0.15 0 0);
+  --radius: 0.5rem;
+  /* Modern rounded */
+  --ring: oklch(0.68 0.18 200);
+  --chart-1: oklch(0.68 0.18 200);
+  /* Cyan */
+  --chart-2: oklch(0.6 0.15 220);
+  /* Blue */
+  --chart-3: oklch(0.7 0.12 180);
+  /* Aqua */
+}
+
+.dark[data-tenant="media-crypto"] {
+  --background: oklch(0.13 0.04 210);
+  /* Deep Blue-Black with cyan tint */
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.17 0.04 210);
+  /* Slightly lighter than background */
+  --card-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.72 0.18 200);
+  /* Brighter cyan for dark mode */
+  --accent: oklch(0.78 0.16 195);
+  /* Vibrant cyan accent */
+  --sidebar: oklch(0.11 0.04 210);
+  /* Darker sidebar with cyan tint */
+  --sidebar-primary: oklch(0.72 0.18 200);
+  --border: oklch(0.28 0.06 210);
+  /* Cyan-tinted borders */
+  --ring: oklch(0.72 0.18 200);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

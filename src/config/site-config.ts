@@ -36,7 +36,17 @@ export const configs: Record<string, SiteConfig> = {
         discordLink: "https://discord.com/invite/gR4mdaDax",
         fallbackAccessLink: "https://lynk.id/belajarlewatmodul"
     },
-    // 2. TechInstitute - Modern Blue/Teal
+    // 2. Media Crypto - Custom Phoenix Theme
+    "media-crypto": {
+        name: "Mediaa Mirror ID",
+        description: "Cryptocurrency Education & Digital Asset Mastery",
+        logoText: "Mediaa Mirror ID",
+        logoImage: "/images/media-logo.png",
+        theme: "phoenix",
+        discordLink: "https://discord.com/invite/WgbwQvxdCc",
+        fallbackAccessLink: "https://id.shp.ee/pjaBmRX"
+    },
+    // 3. TechInstitute - Modern Blue/Teal
     "tech-institute": {
         name: "TechInstitute",
         description: "Future-Ready Technical Skills",
@@ -45,7 +55,7 @@ export const configs: Record<string, SiteConfig> = {
         theme: "tech",
         discordLink: "https://discord.com/invite/gR4mdaDax"
     },
-    // 3. FinancePro - Trustworthy Green/Gold
+    // 4. FinancePro - Trustworthy Green/Gold
     "finance-pro": {
         name: "FinancePro",
         description: "Mastering Wealth Management",
@@ -54,7 +64,7 @@ export const configs: Record<string, SiteConfig> = {
         theme: "finance",
         discordLink: "https://discord.com/invite/gR4mdaDax"
     },
-    // 4. CreativeAcademy - Vibrant Pink/Violet
+    // 5. CreativeAcademy - Vibrant Pink/Violet
     "creative-academy": {
         name: "CreativeAcademy",
         description: "Unleash Your Creative Potential",
@@ -63,7 +73,7 @@ export const configs: Record<string, SiteConfig> = {
         theme: "creative",
         discordLink: "https://discord.com/invite/gR4mdaDax"
     },
-    // 5. SecureNet - Cyber Security Theme
+    // 6. SecureNet - Cyber Security Theme
     "secure-net": {
         name: "SecureNet",
         description: "Advanced Cybersecurity Training",
