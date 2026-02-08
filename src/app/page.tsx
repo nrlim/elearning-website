@@ -37,17 +37,30 @@ export default function Home() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto pt-2">
-                  <LoginModal>
+                  <a
+                    href={siteConfig.fallbackAccessLink || "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <Button size="lg" className="h-14 px-8 text-lg rounded-xl gap-2 shadow-xl shadow-primary/20">
-                      Get All-Access
+                      Buy Access Now
                       <ArrowRight className="h-5 w-5" />
                     </Button>
-                  </LoginModal>
-                  <Link href="#courses">
-                    <Button variant="ghost" size="lg" className="h-14 px-8 text-lg rounded-xl gap-2">
-                      View Catalog
-                    </Button>
-                  </Link>
+                  </a>
+                  {siteConfig.discordLink && (
+                    <Link href={siteConfig.discordLink} target="_blank">
+                      <Button variant="outline" size="lg" className="h-14 px-8 text-lg rounded-xl gap-2 border-primary/20 hover:bg-primary/5">
+                        <svg
+                          viewBox="0 0 24 24"
+                          className="h-5 w-5 fill-primary"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152c-.0766.1363-.1625.321-.2235.4661a18.2736 18.2736 0 00-5.445 0c-.061-.1451-.1469-.3298-.2235-.4661a19.7432 19.7432 0 00-4.8851 1.5152c-3.111 4.6467-3.968 9.1724-3.548 13.6231a20.026 20.026 0 006.0123 3.0336c.4566-.6225.8601-1.2952 1.2014-2.007a13.3444 13.3444 0 01-1.9213-.913c.1625-.119.3193-.242.4704-.3696 3.705 1.71 7.7416 1.71 11.411 0 .1511.1276.3079.2506.4704.3696a13.1906 13.1906 0 01-1.9213.913c.3413.7118.7448 1.3845 1.2014 2.007a20.0347 20.0347 0 006.0123-3.0336c.4912-5.1818-.8486-9.664-3.548-13.6231zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0951 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0951 2.1568 2.419 0 1.3332-.9554 2.4189-2.1568 2.4189z" />
+                        </svg>
+                        Join Discord
+                      </Button>
+                    </Link>
+                  )}
                 </div>
 
                 <div className="pt-8 flex items-center gap-4 text-sm text-muted-foreground">
@@ -292,17 +305,77 @@ export default function Home() {
                       <span className="flex items-center gap-1"><PlayCircle className="h-3 w-3" /> {course.duration}</span>
                     </div>
 
-                    <LoginModal>
-                      <Button className="w-full rounded-xl bg-white text-black hover:bg-white/90 font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                        Start Learning
+                    <a
+                      href={siteConfig.fallbackAccessLink || "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Button className="w-full rounded-xl bg-white text-black hover:bg-white/90 font-bold">
+                        Buy Access Now
                       </Button>
-                    </LoginModal>
+                    </a>
                   </div>
                 </div>
               ))}
             </div>
           </div>
         </section>
+        {/* Community Section - Big & Bold */}
+        {siteConfig.discordLink && (
+          <section className="py-24 relative overflow-hidden">
+            <div className="absolute inset-0 bg-primary/5 -z-10" />
+            <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+            <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+
+            <div className="container mx-auto px-4 md:px-6 relative">
+              <div className="max-w-4xl mx-auto text-center space-y-8">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-bold text-sm tracking-wide uppercase">
+                  <Users className="h-4 w-4" />
+                  Join the Community
+                </div>
+
+                <h2 className="text-4xl md:text-6xl font-bold tracking-tight">
+                  Connect with <span className="text-primary truncate">1,000+</span> crypto enthusiasts
+                </h2>
+
+                <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                  Get real-time market updates, trade signals, and exclusive mentorship.
+                  Our Discord is where the magic happens.
+                </p>
+
+                <div className="pt-8">
+                  <Link href={siteConfig.discordLink} target="_blank">
+                    <Button size="lg" className="h-20 px-12 text-2xl rounded-2xl gap-4 shadow-2xl shadow-primary/30 hover:scale-105 transition-transform bg-[#5865F2] hover:bg-[#4752C4] border-none">
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="h-8 w-8 fill-current"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152c-.0766.1363-.1625.321-.2235.4661a18.2736 18.2736 0 00-5.445 0c-.061-.1451-.1469-.3298-.2235-.4661a19.7432 19.7432 0 00-4.8851 1.5152c-3.111 4.6467-3.968 9.1724-3.548 13.6231a20.026 20.026 0 006.0123 3.0336c.4566-.6225.8601-1.2952 1.2014-2.007a13.3444 13.3444 0 01-1.9213-.913c.1625-.119.3193-.242.4704-.3696 3.705 1.71 7.7416 1.71 11.411 0 .1511.1276.3079.2506.4704.3696a13.1906 13.1906 0 01-1.9213.913c.3413.7118.7448 1.3845 1.2014 2.007a20.0347 20.0347 0 006.0123-3.0336c.4912-5.1818-.8486-9.664-3.548-13.6231zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0951 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0951 2.1568 2.419 0 1.3332-.9554 2.4189-2.1568 2.4189z" />
+                      </svg>
+                      Join Our Discord
+                    </Button>
+                  </Link>
+                </div>
+
+                <div className="pt-12 grid grid-cols-2 md:grid-cols-4 gap-8">
+                  {[
+                    { label: "Active Members", value: "12,400+" },
+                    { label: "Daily Signals", value: "15+" },
+                    { label: "Live Sessions", value: "Weekly" },
+                    { label: "Success Rate", value: "92%" }
+                  ].map((stat, i) => (
+                    <div key={i} className="space-y-1">
+                      <p className="text-3xl font-bold text-primary">{stat.value}</p>
+                      <p className="text-sm text-muted-foreground">{stat.label}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
       </main>
 
       {/* Footer */}

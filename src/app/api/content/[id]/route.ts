@@ -19,20 +19,17 @@ export async function GET(
         const resolvedParams = await params;
         const { id } = resolvedParams;
 
-        console.log(`Fetching content with ID: ${id}`);
-
         const content = await prisma.content.findUnique({
             where: { id }
         })
 
         if (!content) {
-            console.log(`Content with ID ${id} not found`);
             return NextResponse.json({ error: "Content not found" }, { status: 404 })
         }
 
         return NextResponse.json(content)
     } catch (error) {
-        console.error("Error in GET /api/content/[id]:", error);
+        console.error("Error in GET /api/content/[id]");
         return NextResponse.json({ error: "Failed to fetch content", details: error instanceof Error ? error.message : String(error) }, { status: 500 })
     }
 }

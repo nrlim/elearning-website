@@ -7,11 +7,15 @@ import { z } from "zod"
 const moduleTypeSchema = z.object({
     name: z.string().min(1, "Name is required"),
     description: z.string().optional(),
+    discordRoleId: z.string().optional(),
 })
 
 export async function GET() {
     try {
         const types = await prisma.moduleType.findMany({
+            include: {
+                discordRoleMappings: true
+            },
             orderBy: { createdAt: 'desc' }
         })
         return NextResponse.json(types)
@@ -29,9 +33,17 @@ export async function POST(req: Request) {
 
         const body = await req.json()
         const validatedData = moduleTypeSchema.parse(body)
+        const { discordRoleId, ...typeData } = validatedData
 
         const newType = await prisma.moduleType.create({
-            data: validatedData
+            data: {
+                ...typeData,
+                discordRoleMappings: discordRoleId ? {
+                    create: {
+                        discordRoleId: discordRoleId,
+                    }
+                } : undefined
+            }
         })
 
         return NextResponse.json(newType, { status: 201 })
@@ -41,7 +53,7 @@ export async function POST(req: Request) {
         }
         // Check for unique constraint violation
         if ((error as any).code === 'P2002') {
-            return NextResponse.json({ error: "Module type with this name already exists" }, { status: 409 })
+            return NextResponse.json({ error: "Module type with this name or Discord Role ID already exists" }, { status: 409 })
         }
         return NextResponse.json({ error: "Failed to create module type" }, { status: 500 })
     }

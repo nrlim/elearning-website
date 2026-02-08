@@ -7,6 +7,7 @@ import { z } from "zod"
 const moduleTypeSchema = z.object({
     name: z.string().min(1, "Name is required"),
     description: z.string().optional(),
+    discordRoleId: z.string().optional(),
 })
 
 export async function PUT(
@@ -22,10 +23,23 @@ export async function PUT(
 
         const body = await req.json()
         const validatedData = moduleTypeSchema.parse(body)
+        const { discordRoleId, ...typeData } = validatedData
 
+        // Perform update
         const updatedType = await prisma.moduleType.update({
             where: { id: id },
-            data: validatedData
+            data: {
+                ...typeData,
+                discordRoleMappings: {
+                    // Update the mapping if it exists, otherwise create it
+                    // For simplicity, we assume one mapping per type in this UI
+                    // We delete existing and create new or upsert
+                    deleteMany: {}, // Clear existing (simplest way for 1-to-1 managed via UI)
+                    create: discordRoleId ? {
+                        discordRoleId: discordRoleId
+                    } : undefined
+                }
+            }
         })
 
         return NextResponse.json(updatedType)

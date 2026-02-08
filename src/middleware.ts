@@ -8,7 +8,12 @@ export default withAuth(
             return NextResponse.redirect(new URL("/dashboard", req.url))
         }
 
-        // 2. Trial Expiration Check (Secure Hole Fix)
+        // 2. Discord Validation Check
+        if (!req.nextauth.token?.discordId) {
+            return NextResponse.redirect(new URL("/?login=true&error=DiscordRequired", req.url))
+        }
+
+        // 3. Trial Expiration Check (Secure Hole Fix)
         const token = req.nextauth.token
         if (token?.isTrial && token.trialEndsAt) {
             const now = new Date()

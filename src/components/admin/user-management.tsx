@@ -300,7 +300,7 @@ export function UserManagement() {
             doc.save(`users_report_${reportDate.year}_${reportDate.month}.pdf`)
             setReportDialog(false)
         } catch (error) {
-            console.error("Failed to generate report", error)
+            console.error("Failed to generate report")
             alert("Failed to generate report")
         }
     }

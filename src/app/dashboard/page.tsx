@@ -174,7 +174,7 @@ export default function DashboardPage() {
                             const allTypesRes = await axios.get("/api/module-types")
                             types = allTypesRes.data
                         } catch (err) {
-                            console.error("Failed to fetch all module types for admin", err)
+                            console.error("Failed to fetch all module types for admin")
                         }
                     }
 
@@ -188,7 +188,7 @@ export default function DashboardPage() {
                         setSelectedTypeId(types[0].id)
                     }
                 })
-                .catch(err => console.error("Failed to fetch user types", err))
+                .catch(err => console.error("Failed to fetch user types"))
         }
     }, [status])
 
@@ -217,7 +217,7 @@ export default function DashboardPage() {
             setModules(data.data)
             setMeta(data.meta)
         } catch (error) {
-            console.error("Failed to fetch modules", error)
+            console.error("Failed to fetch modules")
         } finally {
             setLoading(false)
         }

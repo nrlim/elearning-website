@@ -35,7 +35,7 @@ export async function GET(
 
         return NextResponse.json(module)
     } catch (error) {
-        console.error("Failed to fetch module:", error);
+        console.error("Failed to fetch module");
         return NextResponse.json({ error: "Failed to fetch module", details: String(error) }, { status: 500 })
     }
 }

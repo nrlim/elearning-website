@@ -49,7 +49,7 @@ export default function ContentDetailPage() {
                 setModule(moduleData)
             }
         } catch (error) {
-            console.error("Failed to fetch content", error)
+            console.error("Failed to fetch content")
         } finally {
             setLoading(false)
         }

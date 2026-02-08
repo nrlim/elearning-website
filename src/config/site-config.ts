@@ -4,6 +4,8 @@ export interface SiteConfig {
     logoText: string;
     logoImage?: string;
     theme: string;
+    discordLink?: string;
+    fallbackAccessLink?: string;
 }
 
 export const configs: Record<string, SiteConfig> = {
@@ -12,14 +14,17 @@ export const configs: Record<string, SiteConfig> = {
         description: "Premium E-Learning Platform for Crypto Enthusiasts",
         logoText: "CryptoLearn",
         logoImage: "/images/cryptolearn-logo.png",
-        theme: "default"
+        theme: "default",
+        discordLink: "https://discord.com/invite/gR4mdaDax",
+        fallbackAccessLink: "https://lynk.id/belajarlewatmodul"
     },
     "corporate-training": {
         name: "SkillFlow",
         description: "Enterprise Training Solutions for Modern Teams",
         logoText: "SkillFlow",
         logoImage: "/images/skillflow-logo.png",
-        theme: "orange"
+        theme: "orange",
+        discordLink: "https://discord.com/invite/gR4mdaDax"
     },
     // 1. Vesper Crypto (Requested) - Premium Dark/Gold
     "vesper-crypto": {
@@ -27,7 +32,9 @@ export const configs: Record<string, SiteConfig> = {
         description: "Elite Cryptocurrency Investment Strategies",
         logoText: "Vesper",
         logoImage: "/images/vesper-logo.png",
-        theme: "vesper"
+        theme: "vesper",
+        discordLink: "https://discord.com/invite/gR4mdaDax",
+        fallbackAccessLink: "https://lynk.id/belajarlewatmodul"
     },
     // 2. TechInstitute - Modern Blue/Teal
     "tech-institute": {
@@ -35,7 +42,8 @@ export const configs: Record<string, SiteConfig> = {
         description: "Future-Ready Technical Skills",
         logoText: "TechInst.",
         logoImage: "/images/tech-institute-logo.png",
-        theme: "tech"
+        theme: "tech",
+        discordLink: "https://discord.com/invite/gR4mdaDax"
     },
     // 3. FinancePro - Trustworthy Green/Gold
     "finance-pro": {
@@ -43,7 +51,8 @@ export const configs: Record<string, SiteConfig> = {
         description: "Mastering Wealth Management",
         logoText: "FinancePro",
         logoImage: "/images/finance-pro-logo.png",
-        theme: "finance"
+        theme: "finance",
+        discordLink: "https://discord.com/invite/gR4mdaDax"
     },
     // 4. CreativeAcademy - Vibrant Pink/Violet
     "creative-academy": {
@@ -51,7 +60,8 @@ export const configs: Record<string, SiteConfig> = {
         description: "Unleash Your Creative Potential",
         logoText: "Create.",
         logoImage: "/images/creative-academy-logo.png",
-        theme: "creative"
+        theme: "creative",
+        discordLink: "https://discord.com/invite/gR4mdaDax"
     },
     // 5. SecureNet - Cyber Security Theme
     "secure-net": {
@@ -59,7 +69,8 @@ export const configs: Record<string, SiteConfig> = {
         description: "Advanced Cybersecurity Training",
         logoText: "SecureNet",
         logoImage: "/images/secure-net-logo.png",
-        theme: "security"
+        theme: "security",
+        discordLink: "https://discord.com/invite/gR4mdaDax"
     }
 };
 

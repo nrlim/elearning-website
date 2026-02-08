@@ -30,7 +30,7 @@ export async function PUT(req: Request) {
 
         return NextResponse.json({ success: true })
     } catch (error) {
-        console.error("Reorder error:", error)
+        console.error("Reorder error")
         return NextResponse.json({ error: "Failed to reorder items" }, { status: 500 })
     }
 }

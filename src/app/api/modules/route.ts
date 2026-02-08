@@ -42,7 +42,23 @@ export async function GET(req: Request) {
         })
 
         if (user) {
-            allowedTypeIds = user.moduleTypes.map(t => t.id)
+            // Get manually assigned types
+            const manualTypeIds = user.moduleTypes.map(t => t.id);
+
+            // Get dynamic types from Discord Roles
+            let discordTypeIds: string[] = [];
+            if (session.user.discordRoles && session.user.discordRoles.length > 0) {
+                const mappings = await prisma.discordRoleMapping.findMany({
+                    where: {
+                        discordRoleId: { in: session.user.discordRoles }
+                    },
+                    select: { moduleTypeId: true }
+                });
+                discordTypeIds = mappings.map(m => m.moduleTypeId);
+            }
+
+            // Combine both (unique)
+            allowedTypeIds = Array.from(new Set([...manualTypeIds, ...discordTypeIds]));
         } else {
             allowedTypeIds = [] // blocked
         }

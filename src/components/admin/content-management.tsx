@@ -397,7 +397,7 @@ export function ContentManagement() {
                 // Send to backend
                 axios.put('/api/content/reorder', {
                     items: updatedContent.map(item => ({ id: item.id, order: item.order }))
-                }).catch(err => console.error("Failed to reorder", err));
+                }).catch(err => console.error("Failed to reorder"));
 
                 return newModules;
             });

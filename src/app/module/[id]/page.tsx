@@ -139,7 +139,7 @@ export default function ModuleDetailPage() {
             const { data } = await axios.get(`/api/modules/${params.id}`)
             setModule(data)
         } catch (error) {
-            console.error("Failed to fetch module", error)
+            console.error("Failed to fetch module")
         } finally {
             setLoading(false)
         }

@@ -9,6 +9,8 @@ declare module "next-auth" {
             role: Role
             isTrial?: boolean
             trialEndsAt?: Date | string
+            discordId?: string
+            discordRoles?: string[]
         } & DefaultSession["user"]
     }
 
@@ -17,6 +19,8 @@ declare module "next-auth" {
         role: Role
         isTrial?: boolean
         trialEndsAt?: Date | string | null
+        discordId?: string | null
+        discordRoles?: string[]
     }
 }
 
@@ -26,5 +30,7 @@ declare module "next-auth/jwt" {
         role: Role
         isTrial?: boolean
         trialEndsAt?: Date | string | null
+        discordId?: string | null
+        discordRoles?: string[]
     }
 }

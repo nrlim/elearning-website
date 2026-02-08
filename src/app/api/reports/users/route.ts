@@ -53,7 +53,7 @@ export async function GET(req: Request) {
 
         return NextResponse.json(users)
     } catch (error) {
-        console.error("Report generation error:", error)
+        console.error("Report generation error")
         return NextResponse.json({ error: "Failed to generate report" }, { status: 500 })
     }
 }
