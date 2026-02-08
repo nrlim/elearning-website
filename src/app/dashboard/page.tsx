@@ -113,7 +113,7 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState("")
     const [page, setPage] = useState(1)
-    const [userModuleTypes, setUserModuleTypes] = useState<{ id: string, name: string, description?: string }[]>([])
+    const [userModuleTypes, setUserModuleTypes] = useState<{ id: string, name: string }[]>([]) // Filter options
     const [selectedTypeId, setSelectedTypeId] = useState<string | null>(null)
     const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
 
@@ -161,35 +161,15 @@ export default function DashboardPage() {
         }
     }, [status, router])
 
-    // Fetch user details to get assigned module types
+    // Fetch available module types for filtering (STATIC LIST)
     useEffect(() => {
         if (status === "authenticated") {
-            axios.get("/api/user/me")
-                .then(async res => {
-                    const userData = res.data
-                    let types = userData.moduleTypes || []
-
-                    // If user is ADMIN or SUPERADMIN, fetch all available module types
-                    if (userData.role === "ADMIN" || userData.role === "SUPERADMIN") {
-                        try {
-                            const allTypesRes = await axios.get("/api/module-types")
-                            types = allTypesRes.data
-                        } catch (err) {
-                            console.error("Failed to fetch all module types for admin")
-                        }
-                    }
-
-                    setUserModuleTypes(types)
-                    // If user has types, select the first one by default?
-                    // Or let them see everything they are allowed to see first (which is the default behavior if no typeId is sent)
-                    // The requirement says: "user can choose the module type first, before rendering all course"
-                    // If they have > 1 type, maybe we force selection or show "All"?
-                    // Let's select the first one if available to streamline the view
-                    if (types.length > 0) {
-                        setSelectedTypeId(types[0].id)
-                    }
+            // Use the new dropdown endpoint which returns ALL non-AIO types
+            axios.get("/api/module-types/dropdown")
+                .then(res => {
+                    setUserModuleTypes(res.data)
                 })
-                .catch(err => console.error("Failed to fetch user types"))
+                .catch(err => console.error("Failed to fetch filter options"))
         }
     }, [status])
 
@@ -411,7 +391,7 @@ export default function DashboardPage() {
                         </h1>
                         <p className="text-muted-foreground">
                             {selectedTypeId
-                                ? userModuleTypes.find(t => t.id === selectedTypeId)?.description || "Browse modules for this program."
+                                ? getBrandInfo(userModuleTypes.find(t => t.id === selectedTypeId)?.name || "")?.description || "Browse modules for this program."
                                 : "Browse your learning modules."}
                         </p>
                     </div>
