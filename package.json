@@ -10,7 +10,9 @@
     "postinstall": "prisma generate",
     "seed:superadmin": "ts-node -P prisma/tsconfig.seed.json prisma/seed-superadmin.ts",
     "backup:content": "ts-node -P prisma/tsconfig.seed.json prisma/backup-content.ts",
-    "restore:content": "ts-node -P prisma/tsconfig.seed.json prisma/restore-content.ts"
+    "restore:content": "ts-node -P prisma/tsconfig.seed.json prisma/restore-content.ts",
+    "generate:favicons": "node scripts/generate-favicons.js",
+    "generate:og-images": "node scripts/generate-og-images.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

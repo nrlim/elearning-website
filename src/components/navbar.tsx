@@ -2,6 +2,7 @@
 
 import { siteConfig } from "@/config/site-config"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { LoginModal } from "@/components/login-modal"
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet"
@@ -25,18 +26,37 @@ export function Navbar() {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
                 >
-                    <div className="relative flex items-center gap-2">
-                        <div className="absolute inset-0 bg-gradient-to-r from-primary to-purple-400 blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-                        <span className="relative text-2xl font-black bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
-                            {siteConfig.logoText}
-                        </span>
-                        {/* Country Flag beside logo */}
-                        {siteConfig.countryFlag && (
-                            <CountryFlag
-                                country={siteConfig.countryFlag}
-                                className="relative w-8 h-6 rounded shadow-sm border border-border/40"
-                            />
+                    <div className="relative flex items-center gap-3">
+                        {/* Logo Image or Fallback */}
+                        {siteConfig.logoImage ? (
+                            <div className="relative h-10 w-10 rounded-xl overflow-hidden shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-all duration-300">
+                                <Image
+                                    src={siteConfig.logoImage}
+                                    alt={siteConfig.name}
+                                    fill
+                                    className="object-cover"
+                                />
+                            </div>
+                        ) : (
+                            <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-primary to-purple-500 flex items-center justify-center text-primary-foreground font-bold shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-all duration-300">
+                                {siteConfig.name.substring(0, 2).toUpperCase()}
+                            </div>
                         )}
+
+                        {/* Site Name and Flag */}
+                        <div className="flex items-center gap-2">
+                            <div className="absolute inset-0 bg-gradient-to-r from-primary to-purple-400 blur-lg opacity-30 group-hover:opacity-50 transition-opacity -z-10" />
+                            <span className="relative text-xl font-black bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
+                                {siteConfig.logoText}
+                            </span>
+                            {/* Country Flag beside logo */}
+                            {siteConfig.countryFlag && (
+                                <CountryFlag
+                                    country={siteConfig.countryFlag}
+                                    className="w-8 h-6 rounded shadow-sm border border-border/40"
+                                />
+                            )}
+                        </div>
                     </div>
                 </Link>
 
@@ -86,14 +106,33 @@ export function Navbar() {
                             </SheetTrigger>
                             <SheetContent side="right">
                                 <SheetHeader>
-                                    <SheetTitle className="text-left font-black bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent flex items-center gap-2">
-                                        {siteConfig.logoText}
-                                        {siteConfig.countryFlag && (
-                                            <CountryFlag
-                                                country={siteConfig.countryFlag}
-                                                className="w-8 h-6 rounded shadow-sm border border-border/40"
-                                            />
+                                    <SheetTitle className="text-left flex items-center gap-3">
+                                        {/* Logo Image in Mobile Menu */}
+                                        {siteConfig.logoImage ? (
+                                            <div className="relative h-8 w-8 rounded-lg overflow-hidden shadow-md">
+                                                <Image
+                                                    src={siteConfig.logoImage}
+                                                    alt={siteConfig.name}
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-primary to-purple-500 flex items-center justify-center text-primary-foreground font-bold text-sm">
+                                                {siteConfig.name.substring(0, 2).toUpperCase()}
+                                            </div>
                                         )}
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-black bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
+                                                {siteConfig.logoText}
+                                            </span>
+                                            {siteConfig.countryFlag && (
+                                                <CountryFlag
+                                                    country={siteConfig.countryFlag}
+                                                    className="w-7 h-5 rounded shadow-sm border border-border/40"
+                                                />
+                                            )}
+                                        </div>
                                     </SheetTitle>
                                 </SheetHeader>
                                 <div className="flex flex-col space-y-6 pt-6">
