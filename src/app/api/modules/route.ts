@@ -47,6 +47,7 @@ export async function GET(req: Request) {
 
             // Get dynamic types from Discord Roles
             let discordTypeIds: string[] = [];
+
             if (session.user.discordRoles && session.user.discordRoles.length > 0) {
                 const mappings = await prisma.discordRoleMapping.findMany({
                     where: {

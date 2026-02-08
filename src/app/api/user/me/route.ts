@@ -22,12 +22,38 @@ export async function GET() {
             return NextResponse.json({ error: "User not found" }, { status: 404 })
         }
 
+        // Initialize with manual types
+        let allModuleTypes = [...user.moduleTypes];
+
+        // Fetch Discord Role mapped types
+        if (session.user.discordRoles && session.user.discordRoles.length > 0) {
+            const discordMappings = await prisma.discordRoleMapping.findMany({
+                where: {
+                    discordRoleId: { in: session.user.discordRoles }
+                },
+                include: {
+                    moduleType: true
+                }
+            });
+
+            const discordTypes = discordMappings.map(m => m.moduleType);
+
+            // Merge and dedup
+            const existingIds = new Set(allModuleTypes.map(t => t.id));
+            discordTypes.forEach(t => {
+                if (!existingIds.has(t.id)) {
+                    allModuleTypes.push(t);
+                    existingIds.add(t.id);
+                }
+            });
+        }
+
         return NextResponse.json({
             id: user.id,
             name: user.name,
             email: user.email,
             role: user.role,
-            moduleTypes: user.moduleTypes
+            moduleTypes: allModuleTypes,
         })
     } catch (error) {
         return NextResponse.json({ error: "Failed to fetch user profile" }, { status: 500 })

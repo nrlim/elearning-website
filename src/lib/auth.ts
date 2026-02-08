@@ -29,83 +29,68 @@ export const authOptions: NextAuthOptions = {
         async signIn({ user, account, profile }) {
             if (account?.provider === "discord") {
                 const discordId = (profile as any)?.id;
-                const guildId = process.env.DISCORD_GUILD_ID;
-                const botToken = process.env.DISCORD_BOT_TOKEN;
-                // Optional: A specific role required just to ENTER the dashboard
-                const requiredEntryRoleId = process.env.DISCORD_ROLE_ID;
 
-                if (!guildId || !botToken) {
-                    console.error("Missing Discord configuration environment variables");
-                    return "/unauthorized";
-                }
-
-                try {
-                    // Fetch member info from Discord API using Bot Token
-                    const response = await axios.get(
-                        `https://discord.com/api/guilds/${guildId}/members/${discordId}`,
-                        {
-                            headers: {
-                                Authorization: `Bot ${botToken}`,
-                            },
-                        }
-                    );
-
-                    const member = response.data;
-                    const roles = member.roles as string[];
-
-                    // 1. Entry Check: Does the user have the minimum required role to log in?
-                    // If DISCORD_ROLE_ID is not set, we allow everyone who is in the server.
-                    if (requiredEntryRoleId && !roles.includes(requiredEntryRoleId)) {
-                        return "/unauthorized";
+                // Basic User Upsert without Role Logic (Roles handled in JWT)
+                await prisma.user.upsert({
+                    where: { email: user.email! },
+                    update: { discordId: discordId },
+                    create: {
+                        email: user.email!,
+                        name: user.name,
+                        discordId: discordId,
+                        role: "USER",
+                        status: "ACTIVE"
                     }
-
-                    // 2. Attach roles to the user object temporarily so it can be picked up by JWT callback
-                    (user as any).discordRoles = roles;
-                    (user as any).discordId = discordId;
-
-                    // 3. Determine Website Role based on Discord Roles
-                    // Define which Discord Role ID should become an ADMIN on the website
-                    const discordAdminRoleId = process.env.DISCORD_ADMIN_ROLE_ID;
-                    const isDiscordAdmin = discordAdminRoleId && roles.includes(discordAdminRoleId);
-                    const websiteRole = isDiscordAdmin ? "ADMIN" : "USER";
-
-                    // 4. Sync User in DB
-                    const dbUser = await prisma.user.upsert({
-                        where: { email: user.email! },
-                        update: {
-                            discordId: discordId,
-                            // Only update role if it's currently USER to avoid downgrading superadmins
-                            role: isDiscordAdmin ? "ADMIN" : undefined
-                        },
-                        create: {
-                            email: user.email!,
-                            name: user.name,
-                            discordId: discordId,
-                            role: websiteRole as any,
-                            status: "ACTIVE"
-                        }
-                    });
-
-                    // Attach the actual DB role to the user object for the JWT callback
-                    user.role = dbUser.role;
-
-                    return true;
-                } catch (error) {
-                    console.error("Discord Role Check Error");
-                    return "/unauthorized";
-                }
+                });
             }
             return true;
         },
-        async jwt({ token, user }) {
-            if (user) {
-                token.role = user.role
+        async jwt({ token, user, account, profile }) {
+            // Initial sign in
+            if (user && account && account.provider === "discord") {
+                const discordId = (profile as any)?.id;
+                token.id = user.id;
+                token.role = user.role;
+                token.discordId = discordId;
+
+                // Fetch Discord Roles HERE to ensure they are in the token
+                try {
+                    const guildId = process.env.DISCORD_GUILD_ID;
+                    const botToken = process.env.DISCORD_BOT_TOKEN;
+
+                    if (guildId && botToken && discordId) {
+                        const response = await axios.get(
+                            `https://discord.com/api/guilds/${guildId}/members/${discordId}`,
+                            { headers: { Authorization: `Bot ${botToken}` } }
+                        );
+                        const roles = response.data.roles as string[];
+                        token.discordRoles = roles;
+
+                        // Update User Role in DB if Admin
+                        const discordAdminRoleId = process.env.DISCORD_ADMIN_ROLE_ID;
+                        if (discordAdminRoleId && roles.includes(discordAdminRoleId)) {
+                            token.role = "ADMIN";
+                            // Async update to DB
+                            prisma.user.update({
+                                where: { id: user.id },
+                                data: { role: "ADMIN" }
+                            }).catch(err => console.error("Failed to sync admin role", err));
+                        }
+                    }
+                } catch (error) {
+                    console.error("[Auth] JWT Role Fetch Error:", error);
+                    token.discordRoles = [];
+                }
+            } else if (user) {
+                // Non-discord login or subsequent token updates
                 token.id = user.id
-                token.isTrial = user.isTrial
-                token.trialEndsAt = user.trialEndsAt
-                token.discordId = user.discordId
-                token.discordRoles = (user as any).discordRoles
+                token.role = user.role
             }
+
+            // On subsequent calls, token.discordRoles should already be there. 
+            // If we want to refresh roles on every session check, we could do it here too, 
+            // but for performance, let's trust the token for the session duration (1 hour).
+
             return token
         },
         async session({ session, token }) {
