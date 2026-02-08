@@ -26,7 +26,6 @@ import axios from "axios"
 interface ModuleType {
     id: string
     name: string
-    description: string
     createdAt: string
     discordRoleMappings?: {
         discordRoleId: string
@@ -39,7 +38,7 @@ export function ModuleTypeManagement() {
     const [loading, setLoading] = useState(true)
     const [dialogOpen, setDialogOpen] = useState(false)
     const [editingType, setEditingType] = useState<ModuleType | null>(null)
-    const [formData, setFormData] = useState({ name: "", description: "", discordRoleId: "", isAio: false })
+    const [formData, setFormData] = useState({ name: "", discordRoleId: "", isAio: false })
 
     const fetchTypes = async () => {
         try {
@@ -59,7 +58,7 @@ export function ModuleTypeManagement() {
 
     const handleCreate = () => {
         setEditingType(null)
-        setFormData({ name: "", description: "", discordRoleId: "", isAio: false })
+        setFormData({ name: "", discordRoleId: "", isAio: false })
         setDialogOpen(true)
     }
 
@@ -67,7 +66,6 @@ export function ModuleTypeManagement() {
         setEditingType(type)
         setFormData({
             name: type.name,
-            description: type.description,
             discordRoleId: type.discordRoleMappings?.[0]?.discordRoleId || "",
             isAio: type.isAio || false
         })
@@ -115,7 +113,6 @@ export function ModuleTypeManagement() {
                             <TableHeader className="bg-white/5">
                                 <TableRow className="hover:bg-transparent border-white/10">
                                     <TableHead className="text-slate-300">Name</TableHead>
-                                    <TableHead className="text-slate-300">Description</TableHead>
                                     <TableHead className="text-slate-300">Discord Role ID</TableHead>
                                     <TableHead className="text-right text-slate-300">Actions</TableHead>
                                 </TableRow>
@@ -138,7 +135,6 @@ export function ModuleTypeManagement() {
                                                     {type.name}
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="text-slate-400">{type.description}</TableCell>
                                             <TableCell>
                                                 {type.discordRoleMappings?.[0] ? (
                                                     <code className="px-2 py-1 rounded bg-indigo-500/10 text-indigo-400 text-xs border border-indigo-500/20">
@@ -186,15 +182,6 @@ export function ModuleTypeManagement() {
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 placeholder="Type Name"
-                                className="bg-white/5 border-white/10 focus:border-indigo-500/50"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label className="text-slate-400">Description</Label>
-                            <Input
-                                value={formData.description}
-                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                placeholder="Description (optional)"
                                 className="bg-white/5 border-white/10 focus:border-indigo-500/50"
                             />
                         </div>

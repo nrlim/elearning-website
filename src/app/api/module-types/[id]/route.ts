@@ -6,8 +6,9 @@ import { z } from "zod"
 
 const moduleTypeSchema = z.object({
     name: z.string().min(1, "Name is required"),
-    description: z.string().optional(),
+    // description: z.string().optional(), // Removed from DB schema
     discordRoleId: z.string().optional(),
+    isAio: z.boolean().optional().default(false),
 })
 
 export async function PUT(
@@ -23,13 +24,14 @@ export async function PUT(
 
         const body = await req.json()
         const validatedData = moduleTypeSchema.parse(body)
-        const { discordRoleId, ...typeData } = validatedData
+        const { discordRoleId, isAio, ...typeData } = validatedData
 
         // Perform update
         const updatedType = await prisma.moduleType.update({
             where: { id: id },
             data: {
                 ...typeData,
+                isAio: isAio, // ✅ Update isAio flag
                 discordRoleMappings: {
                     // Update the mapping if it exists, otherwise create it
                     // For simplicity, we assume one mapping per type in this UI
@@ -47,6 +49,11 @@ export async function PUT(
         if (error instanceof z.ZodError) {
             return NextResponse.json({ error: error.errors[0].message }, { status: 400 })
         }
+        // Check for unique constraint violation
+        if ((error as any).code === 'P2002') {
+            return NextResponse.json({ error: "Module type with this name or Discord Role ID already exists for this tenant" }, { status: 409 })
+        }
+        console.error('[Module Type Update API] Error:', error)
         return NextResponse.json({ error: "Failed to update module type" }, { status: 500 })
     }
 }

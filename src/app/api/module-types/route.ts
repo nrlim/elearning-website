@@ -6,7 +6,7 @@ import { z } from "zod"
 
 const moduleTypeSchema = z.object({
     name: z.string().min(1, "Name is required"),
-    description: z.string().optional(),
+    // description: z.string().optional(), // Removed from DB schema
     discordRoleId: z.string().optional(),
     isAio: z.boolean().optional().default(false),
 })
