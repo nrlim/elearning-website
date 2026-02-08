@@ -75,21 +75,29 @@ model Module {
 
 model ModuleType {
   id          String   @id @default(uuid())
-  name        String   @unique
+  name        String
   description String?
+  tenant      String   @default("default")  // Tenant identifier from env
   createdAt   DateTime @default(now())
   modules     Module[]
   users       User[]
   discordRoleMappings DiscordRoleMapping[]
+  
+  @@unique([name, tenant])  // Name must be unique per tenant
+  @@index([tenant])
 }
 
 model DiscordRoleMapping {
   id            String     @id @default(uuid())
-  discordRoleId String     @unique  // The ID of the role in Discord
-  roleName      String?             // Friendly name for reference
+  discordRoleId String     // Discord role ID (no longer globally unique)
+  roleName      String?    // Friendly name for reference
+  tenant        String     @default("default")  // Tenant identifier
   moduleTypeId  String
   moduleType    ModuleType @relation(fields: [moduleTypeId], references: [id], onDelete: Cascade)
   createdAt     DateTime   @default(now())
+  
+  @@unique([discordRoleId, tenant])  // Role ID must be unique per tenant
+  @@index([tenant])
 }
 
 model Content {

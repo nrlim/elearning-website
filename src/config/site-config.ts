@@ -4,6 +4,7 @@ export interface SiteConfig {
     logoText: string;
     logoImage?: string;
     theme: string;
+    countryFlag?: string;  // Flag emoji or icon to show beside logo
     discordLink?: string;
     fallbackAccessLink?: string;
 }
@@ -35,14 +36,16 @@ export const configs: Record<string, SiteConfig> = {
         theme: "vesper",
         discordLink: "https://discord.com/invite/gR4mdaDax",
         fallbackAccessLink: "https://lynk.id/belajarlewatmodul"
+        // No flag for Vesper
     },
-    // 2. Media Crypto - Custom Phoenix Theme
+    // 2. Media Crypto - Custom Phoenix Theme with Indonesian Flag
     "media-crypto": {
         name: "Mediaa Mirror ID",
         description: "Cryptocurrency Education & Digital Asset Mastery",
         logoText: "Mediaa Mirror ID",
         logoImage: "/images/media-logo.png",
         theme: "phoenix",
+        countryFlag: "🇮🇩",  // Indonesian flag emoji
         discordLink: "https://discord.com/invite/WgbwQvxdCc",
         fallbackAccessLink: "https://id.shp.ee/pjaBmRX"
     },

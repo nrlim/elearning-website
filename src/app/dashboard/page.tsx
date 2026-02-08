@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { siteConfig } from "@/config/site-config"
+import { CountryFlag } from "@/components/country-flag"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -271,9 +272,18 @@ export default function DashboardPage() {
                                     {siteConfig.name.substring(0, 2).toUpperCase()}
                                 </div>
                             )}
-                            <span className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                                {siteConfig.name}
-                            </span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                                    {siteConfig.name}
+                                </span>
+                                {/* Country Flag beside logo */}
+                                {siteConfig.countryFlag && (
+                                    <CountryFlag
+                                        country={siteConfig.countryFlag}
+                                        className="w-7 h-5 rounded shadow-sm border border-border/30"
+                                    />
+                                )}
+                            </div>
                         </Link>
 
                         {/* Module Type Dropdown (Desktop) */}

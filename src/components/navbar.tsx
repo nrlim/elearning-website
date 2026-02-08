@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { LoginModal } from "@/components/login-modal"
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
+import { CountryFlag } from "@/components/country-flag"
 
 import { useSession } from "next-auth/react"
 import { LayoutDashboard, ShieldCheck } from "lucide-react"
@@ -24,11 +25,18 @@ export function Navbar() {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
                 >
-                    <div className="relative">
+                    <div className="relative flex items-center gap-2">
                         <div className="absolute inset-0 bg-gradient-to-r from-primary to-purple-400 blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
                         <span className="relative text-2xl font-black bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
                             {siteConfig.logoText}
                         </span>
+                        {/* Country Flag beside logo */}
+                        {siteConfig.countryFlag && (
+                            <CountryFlag
+                                country={siteConfig.countryFlag}
+                                className="relative w-8 h-6 rounded shadow-sm border border-border/40"
+                            />
+                        )}
                     </div>
                 </Link>
 
@@ -78,8 +86,14 @@ export function Navbar() {
                             </SheetTrigger>
                             <SheetContent side="right">
                                 <SheetHeader>
-                                    <SheetTitle className="text-left font-black bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
+                                    <SheetTitle className="text-left font-black bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent flex items-center gap-2">
                                         {siteConfig.logoText}
+                                        {siteConfig.countryFlag && (
+                                            <CountryFlag
+                                                country={siteConfig.countryFlag}
+                                                className="w-8 h-6 rounded shadow-sm border border-border/40"
+                                            />
+                                        )}
                                     </SheetTitle>
                                 </SheetHeader>
                                 <div className="flex flex-col space-y-6 pt-6">

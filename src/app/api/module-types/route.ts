@@ -12,9 +12,19 @@ const moduleTypeSchema = z.object({
 
 export async function GET() {
     try {
+        // 🎯 Get current tenant from environment
+        const tenant = process.env.NEXT_PUBLIC_TENANT || "default"
+
         const types = await prisma.moduleType.findMany({
+            where: {
+                tenant  // ✅ Filter by current tenant
+            },
             include: {
-                discordRoleMappings: true
+                discordRoleMappings: {
+                    where: {
+                        tenant  // ✅ Only show role mappings for this tenant
+                    }
+                }
             },
             orderBy: { createdAt: 'desc' }
         })
@@ -35,14 +45,22 @@ export async function POST(req: Request) {
         const validatedData = moduleTypeSchema.parse(body)
         const { discordRoleId, ...typeData } = validatedData
 
+        // 🎯 Get current tenant from environment
+        const tenant = process.env.NEXT_PUBLIC_TENANT || "default"
+
         const newType = await prisma.moduleType.create({
             data: {
                 ...typeData,
+                tenant,  // ✅ Automatically assign tenant
                 discordRoleMappings: discordRoleId ? {
                     create: {
                         discordRoleId: discordRoleId,
+                        tenant  // ✅ Assign tenant to role mapping
                     }
                 } : undefined
+            },
+            include: {
+                discordRoleMappings: true
             }
         })
 
@@ -53,8 +71,9 @@ export async function POST(req: Request) {
         }
         // Check for unique constraint violation
         if ((error as any).code === 'P2002') {
-            return NextResponse.json({ error: "Module type with this name or Discord Role ID already exists" }, { status: 409 })
+            return NextResponse.json({ error: "Module type with this name or Discord Role ID already exists for this tenant" }, { status: 409 })
         }
+        console.error('[Module Type API] Error:', error)
         return NextResponse.json({ error: "Failed to create module type" }, { status: 500 })
     }
 }
