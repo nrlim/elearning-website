@@ -76,7 +76,7 @@ model Module {
 model ModuleType {
   id          String   @id @default(uuid())
   name        String
-  description String?
+  isAio       Boolean  @default(false)
   tenant      String   @default("default")  // Tenant identifier from env
   createdAt   DateTime @default(now())
   modules     Module[]

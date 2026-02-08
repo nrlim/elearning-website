@@ -8,6 +8,7 @@ const moduleTypeSchema = z.object({
     name: z.string().min(1, "Name is required"),
     description: z.string().optional(),
     discordRoleId: z.string().optional(),
+    isAio: z.boolean().optional().default(false),
 })
 
 export async function GET() {
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
 
         const body = await req.json()
         const validatedData = moduleTypeSchema.parse(body)
-        const { discordRoleId, ...typeData } = validatedData
+        const { discordRoleId, isAio, ...typeData } = validatedData
 
         // 🎯 Get current tenant from environment
         const tenant = process.env.NEXT_PUBLIC_TENANT || "default"
@@ -51,6 +52,7 @@ export async function POST(req: Request) {
         const newType = await prisma.moduleType.create({
             data: {
                 ...typeData,
+                isAio: isAio, // ✅ Set isAio flag
                 tenant,  // ✅ Automatically assign tenant
                 discordRoleMappings: discordRoleId ? {
                     create: {

@@ -31,6 +31,7 @@ interface ModuleType {
     discordRoleMappings?: {
         discordRoleId: string
     }[]
+    isAio: boolean
 }
 
 export function ModuleTypeManagement() {
@@ -38,7 +39,7 @@ export function ModuleTypeManagement() {
     const [loading, setLoading] = useState(true)
     const [dialogOpen, setDialogOpen] = useState(false)
     const [editingType, setEditingType] = useState<ModuleType | null>(null)
-    const [formData, setFormData] = useState({ name: "", description: "", discordRoleId: "" })
+    const [formData, setFormData] = useState({ name: "", description: "", discordRoleId: "", isAio: false })
 
     const fetchTypes = async () => {
         try {
@@ -58,7 +59,7 @@ export function ModuleTypeManagement() {
 
     const handleCreate = () => {
         setEditingType(null)
-        setFormData({ name: "", description: "", discordRoleId: "" })
+        setFormData({ name: "", description: "", discordRoleId: "", isAio: false })
         setDialogOpen(true)
     }
 
@@ -67,7 +68,8 @@ export function ModuleTypeManagement() {
         setFormData({
             name: type.name,
             description: type.description,
-            discordRoleId: type.discordRoleMappings?.[0]?.discordRoleId || ""
+            discordRoleId: type.discordRoleMappings?.[0]?.discordRoleId || "",
+            isAio: type.isAio || false
         })
         setDialogOpen(true)
     }
@@ -147,7 +149,12 @@ export function ModuleTypeManagement() {
                                                 )}
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                <div className="flex justify-end gap-2">
+                                                {type.isAio && (
+                                                    <span className="inline-flex items-center px-2 py-1 rounded bg-yellow-500/10 text-yellow-500 text-xs border border-yellow-500/20 mr-2">
+                                                        Access All Areas (AIO)
+                                                    </span>
+                                                )}
+                                                <div className="flex justify-end gap-2 inline-flex">
                                                     <Button variant="ghost" size="icon" className="hover:bg-white/10 text-slate-400" onClick={() => handleEdit(type)}>
                                                         <Pencil className="h-4 w-4" />
                                                     </Button>
@@ -203,6 +210,24 @@ export function ModuleTypeManagement() {
                                 className="bg-white/5 border-indigo-500/20 focus:border-indigo-500 outline-none"
                             />
                             <p className="text-[10px] text-slate-500 italic">User with this role in Discord will automatically see modules of this type.</p>
+                        </div>
+                        <div className="space-y-4 pt-4 border-t border-white/5">
+                            <div className="flex items-center space-x-2">
+                                <input
+                                    type="checkbox"
+                                    id="isAio"
+                                    checked={formData.isAio}
+                                    onChange={(e) => setFormData({ ...formData, isAio: e.target.checked })}
+                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 bg-white/5 border-white/10"
+                                />
+                                <Label htmlFor="isAio" className="text-slate-300 font-medium cursor-pointer">
+                                    Enable Universal Access (AIO)
+                                </Label>
+                            </div>
+                            <p className="text-[11px] text-yellow-500/80 leading-snug">
+                                ⚠️ If enabled, users with this module type (via Role or Manual Assign) will bypass all restrictions and can view <strong>ALL modules</strong> in the system.
+                                Useful for VIP/AIO roles.
+                            </p>
                         </div>
                     </div>
                     <DialogFooter>

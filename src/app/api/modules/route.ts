@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { z } from "zod"
 
+
 const moduleSchema = z.object({
     title: z.string().min(1, "Title is required"),
     description: z.string().min(1, "Description is required"),
@@ -36,12 +37,22 @@ export async function GET(req: Request) {
     let allowedTypeIds: string[] | null = null // null means all keys (admin)
 
     if (session && session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN") {
+        // Fetch user with their module types AND check for AIO access
         const user = await prisma.user.findUnique({
             where: { email: session.user.email! },
-            include: { moduleTypes: true }
+            include: {
+                moduleTypes: true
+            }
         })
 
+        let hasAioAccess = false;
+
         if (user) {
+            // Check manual assignments for AIO
+            if (user.moduleTypes.some(t => t.isAio)) {
+                hasAioAccess = true;
+            }
+
             // Get manually assigned types
             const manualTypeIds = user.moduleTypes.map(t => t.id);
 
@@ -53,13 +64,26 @@ export async function GET(req: Request) {
                     where: {
                         discordRoleId: { in: session.user.discordRoles }
                     },
-                    select: { moduleTypeId: true }
+                    select: {
+                        moduleTypeId: true,
+                        moduleType: { select: { isAio: true } } // Fetch isAio status
+                    }
                 });
+
                 discordTypeIds = mappings.map(m => m.moduleTypeId);
+
+                // Check if any discord mapped role has AIO access
+                if (mappings.some(m => m.moduleType.isAio)) {
+                    hasAioAccess = true;
+                }
             }
 
-            // Combine both (unique)
-            allowedTypeIds = Array.from(new Set([...manualTypeIds, ...discordTypeIds]));
+            if (hasAioAccess) {
+                allowedTypeIds = null; // Grant ALL access
+            } else {
+                // Combine both (unique)
+                allowedTypeIds = Array.from(new Set([...manualTypeIds, ...discordTypeIds]));
+            }
         } else {
             allowedTypeIds = [] // blocked
         }
