@@ -56,7 +56,7 @@ export const configs: Record<string, SiteConfig> = {
         theme: "phoenix",
         countryFlag: "🇮🇩",  // Indonesian flag emoji
         discordLink: "https://discord.com/invite/WgbwQvxdCc",
-        fallbackAccessLink: "https://id.shp.ee/pjaBmRX"
+        fallbackAccessLink: "https://id.shp.ee/fFXANQA"
     },
     // 3. TechInstitute - Modern Blue/Teal
     "tech-institute": {
