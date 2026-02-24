@@ -41,7 +41,7 @@ export const configs: Record<string, SiteConfig> = {
         logoImage: "/images/vesper-logo.png",
         ogImage: "/images/vesper-logo.png",
         theme: "vesper",
-        discordLink: "https://discord.com/invite/gR4mdaDax",
+        discordLink: "https://discord.com/invite/UAW6vbWKz",
         fallbackAccessLink: "https://lynk.id/belajarlewatmodul"
         // No flag for Vesper
     },
